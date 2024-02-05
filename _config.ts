@@ -47,9 +47,7 @@ const isLinkExternal = (link: string) => {
 
 site.preprocess([".html"], (pages) => {
   pages.forEach((page) => {
-    const contentRoot = /content.robstarbuck.uk/;
-    if(contentRoot.test(page.src.path)){
-      page.data.url = page.data.url.replace(contentRoot, 'posts');
+    if(/posts/.test(page.src.path)){
       page.data.tags = ["post"];
       page.data.layout = "post.vto";
     }
