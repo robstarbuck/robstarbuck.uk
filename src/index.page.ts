@@ -4,7 +4,7 @@ export const title = "Posts";
 
 export const data = {
   hideTitle: true,
-}
+};
 
 export default function (page: Lume.Data) {
   const posts = page.search.pages("post");
@@ -23,7 +23,10 @@ export default function (page: Lume.Data) {
         })
         .join("")}
     </ul>
-    <hr />
-    <a href="${cv?.url}">CV ${month} ${year}</a>
-  `;
+  `.concat(
+    cv
+      ? `<hr />
+          <a href="${cv?.url}">CV ${month} ${year}</a>`
+      : ``
+  );
 }
