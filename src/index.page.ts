@@ -1,4 +1,4 @@
-export const layout = "post.vto";
+export const layout = "index.vto";
 
 export const title = "Posts";
 

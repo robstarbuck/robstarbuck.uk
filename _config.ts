@@ -51,7 +51,7 @@ site.preprocess([".html"], (pages) => {
   pages.forEach((page) => {
     if (/posts/.test(page.src.path)) {
       page.data.tags = ["post"];
-      page.data.layout = "post.vto";
+      page.data.layout = "index.vto";
     }
     if (page.data.title?.toLocaleLowerCase() === "cv") {
       const [cvDate] = page.data.date.toISOString().split("T");
