@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="stylesheet" href="/font.css">
+</head>
+<body>
+  <nav>
+    <a href="/">
+      robstarbuck.uk
+    </a>
+  </nav>
+  <main>
+    <div class="content">
+    {{ content }}
+    </div>
+  </main>
+  <footer>
+    <a href="{{ github }}">
+      {{ comp.logo.github() }}
+      <time datetime="{{ buildDate }} {{ buildTime }}.000">Built {{ buildDate }}</time>
+    </a>
+  </footer>
+</body>
+<link rel="stylesheet" href="/minireset.css"></link>
+<link rel="stylesheet" href="/vertical-rhythm.css"></link>
+<link rel="stylesheet" href="/index.css"></link>
+<link rel="stylesheet" href="/cv.css"></link>
+</html>
