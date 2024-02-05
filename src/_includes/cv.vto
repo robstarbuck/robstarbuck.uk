@@ -18,6 +18,14 @@
     {{ content }}
     </div>
   </main>
+  <div class="post-script">
+    {{ if pdfLink }}
+    <a href="{{ pdfLink }}">⤓ PDF</a>
+    {{ /if }}
+    {{ if markdownLink }}
+    <a href="{{ markdownLink }}">Markdown</a>
+    {{ /if }}
+  </div>
   <footer>
     <a href="{{ github }}">
       {{ comp.logo.github() }}

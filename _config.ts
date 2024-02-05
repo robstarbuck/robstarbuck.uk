@@ -10,8 +10,10 @@ const [date, time] = new Date().toISOString().split(/T|\./);
 site.data("buildDate", date);
 site.data("buildTime", time);
 
-site.data("github", "https://github.com/robstarbuck/");
+site.data("github", "https://github.com/robstarbuck");
 site.data("logoFill", "#2b2031");
+
+site.copy([".pdf", ".png"]);
 
 site.copy("code", ".");
 site.copy("styles", ".");
@@ -47,11 +49,20 @@ const isLinkExternal = (link: string) => {
 
 site.preprocess([".html"], (pages) => {
   pages.forEach((page) => {
-    if(/posts/.test(page.src.path)){
+    if (/posts/.test(page.src.path)) {
       page.data.tags = ["post"];
       page.data.layout = "post.vto";
     }
     if (page.data.title?.toLocaleLowerCase() === "cv") {
+      const [cvDate] = page.data.date.toISOString().split("T");
+      const pdfName = cvDate.concat(".pdf");
+      const pdfMatch = site.files.find((f) => f.entry.name === pdfName);
+      page.data.pdfLink = pdfMatch?.entry.path;
+
+      const { github, repoUrl } = page.data;
+      page.data.markdownLink =
+        github && repoUrl ? github.concat(repoUrl) : undefined;
+
       page.data.layout = "cv.vto";
       page.data.url = "./cv/";
       page.data.tags = ["document", "cv"];

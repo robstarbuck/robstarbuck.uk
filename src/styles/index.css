@@ -77,7 +77,8 @@ main {
 }
 
 nav,
-footer {
+footer,
+.post-script {
     max-width: var(--width-trunk);
     margin-inline: auto;
     height: var(--rh8);
@@ -85,6 +86,14 @@ footer {
     place-items: center;
     box-sizing: content-box;
     padding: 0 var(--r);
+    gap: var(--r);
+}
+
+.post-script {
+    height: var(--rh4);
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--shade3);
+    padding: 0;
 }
 
 footer a {
