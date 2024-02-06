@@ -1,3 +1,4 @@
+import { Page } from "lume/core/file.ts";
 import lume from "lume/mod.ts";
 import codeHighlight from "lume/plugins/code_highlight.ts";
 
@@ -71,7 +72,7 @@ site.preprocess([".html"], (pages) => {
   // page.data.filename = page.src.path + page.src.ext;
 });
 
-site.process([".html"], (pages) => {
+site.process([".html"], (pages, allPages) => {
   const cv = pages.find((p) => p.data.title === "CV");
 
   cv?.document?.querySelectorAll("h1").forEach((h1) => {
@@ -102,6 +103,16 @@ site.process([".html"], (pages) => {
       }
     });
   });
+
+  const readMe = Page.create({
+    url: "README.md",
+    content: `# Site Build
+      - Page Count: ${allPages.length}
+      - Build Date: ${date} ${time}
+    `,
+  });
+
+  allPages.push(readMe);
 });
 
 export default site;

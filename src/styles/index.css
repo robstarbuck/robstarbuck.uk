@@ -184,3 +184,7 @@ footer a {
     place-items: baseline;
     gap: var(--rh);
 }
+
+::selection {
+    background-color: var(--shade6);
+}
