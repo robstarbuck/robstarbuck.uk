@@ -126,8 +126,10 @@ hr {
     border: 0.5px solid var(--shade6);
 }
 
+.svg,
 .image,
 .iframe,
+.custom,
 pre {
     overflow: hidden;
     border-radius: var(--rq);
@@ -144,7 +146,8 @@ pre {
 }
 
 img,
-iframe {
+iframe,
+svg {
     display: block;
 }
 
@@ -187,4 +190,12 @@ footer a {
 
 ::selection {
     background-color: var(--shade6);
+}
+
+ol {
+    list-style-position: inside;
+}
+ul {
+    list-style: disc;
+    list-style-position: inside;
 }
