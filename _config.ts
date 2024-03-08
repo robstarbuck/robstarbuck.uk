@@ -80,7 +80,7 @@ site.preprocess([".html"], (pages) => {
         page.data.layout = "index.vto";
       }
     }
-    
+
     page.data.modules = page.data.modules ?? [];
 
     if (page.data.title?.toLocaleLowerCase() === "cv") {
@@ -162,8 +162,8 @@ site.process([".html"], (pages, allPages) => {
       const breakoutButtonColor = element.getAttribute(
         "data-breakout-button-color"
       );
-      const breakoutUrl = page.data.url + urlSuffix ?? "breakout";
-      
+
+      const breakoutUrl = page.data.url + urlSuffix + ".html" ?? "breakout/";
 
       const a = doc.createElement("a");
       a.setAttribute("href", breakoutUrl);
