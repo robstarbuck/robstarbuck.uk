@@ -17,7 +17,7 @@ export default function (page: Lume.Data) {
 
   return `
     <ul>
-      ${posts
+      ${posts.reverse()
         .map((post) => {
           return `<li><a href="${post.url}">${post.title}</a></li>`;
         })

@@ -15,15 +15,15 @@
     --code-shade8: var(--shade8);
 
     /* https://gka.github.io/palettes/#/9|s|34806c,00ff8d,fffcf8|662483,00eaff|1|1 */
-    --code-accent0: #34806c;
-    --code-accent1: #379372;
-    --code-accent2: #3da679;
-    --code-accent3: #48b882;
-    --code-accent4: #59ca8e;
-    --code-accent5: #71dc9c;
-    --code-accent6: #91ecb0;
-    --code-accent7: #bcf8cb;
-    --code-accent8: #fffcf8;
+    --code-accent0: #004f4d;
+    --code-accent1: #146658;
+    --code-accent2: #297d64;
+    --code-accent3: #409470;
+    --code-accent4: #5bac7e;
+    --code-accent5: #7ac38e;
+    --code-accent6: #9fd99f;
+    --code-accent7: #caeeb4;
+    --code-accent8: #ffffcc;
 
     --code-attr: #88efff;
 
@@ -34,23 +34,14 @@
     --highlight-attribute: var(--code-accent7);
     --highlight-symbol: #c59bc1;
     --highlight-namespace: var(--code-accent6);
-    --highlight-variable: #ffff80;
+    --highlight-variable: #ffef16;
     --highlight-literal: var(--code-attr);
     --highlight-punctuation: var(--code-shade2);
     --highlight-deletion: #de7176;
     --highlight-addition: var(--code-accent4);
 }
 
-pre code {
-    border-radius: calc(var(--r) * 0.25);
-}
 
-pre code {
-    display: block;
-    padding: calc(var(--pd) * 0.5);
-    color: var(--highlight-color);
-    background: var(--highlight-bg);
-}
 
 .hljs-subst {
     color: var(--highlight-color);

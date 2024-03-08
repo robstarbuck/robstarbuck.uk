@@ -1,10 +1,26 @@
 import { Page } from "lume/core/file.ts";
 import lume from "lume/mod.ts";
 import codeHighlight from "lume/plugins/code_highlight.ts";
+import esbuild from "lume/plugins/esbuild.ts";
 
 const site = lume({
   src: "./src",
 });
+
+site.use(
+  esbuild({
+    extensions: [".ts", ".js"],
+    options: {
+      bundle: true,
+      format: "esm",
+      minify: true,
+      keepNames: true,
+      platform: "browser",
+      target: "esnext",
+      treeShaking: true,
+    },
+  })
+);
 
 const [date, time] = new Date().toISOString().split(/T|\./);
 
@@ -64,6 +80,9 @@ site.preprocess([".html"], (pages) => {
         page.data.layout = "index.vto";
       }
     }
+    
+    page.data.modules = page.data.modules ?? [];
+
     if (page.data.title?.toLocaleLowerCase() === "cv") {
       const [cvDate] = page.data.date.toISOString().split("T");
       const pdfName = cvDate.concat(".pdf");
@@ -96,32 +115,6 @@ site.process([".html"], (pages, allPages) => {
     }
 
     // Create demo pages wherever a .create-page element exists
-    document
-      .querySelectorAll("main :where(.create-page)")
-      .forEach((element) => {
-        // Avoid mutating the original page
-        const doc = page.document?.cloneNode(true) as Document;
-        const main = doc?.querySelector("main");
-        const nav = doc?.querySelector("nav");
-        const footer = doc?.querySelector("footer");
-        if(nav){
-          nav.parentElement?.removeChild(nav)
-        }
-        if (footer) {
-          footer.parentElement?.removeChild(footer);
-        }
-        if (main) {
-          main.outerHTML = element.outerHTML;
-        }
-
-        const demoPage = Page.create({
-          title: page.data.title,
-          url: page.data.url + "demo",
-          content: doc?.documentElement.outerHTML,
-          layout: "index.vto",
-        });
-        allPages.push(demoPage);
-      });
 
     document
       .querySelectorAll("main :where(iframe, a, img, svg)")
@@ -159,6 +152,50 @@ site.process([".html"], (pages, allPages) => {
           return;
         }
       });
+
+    document.querySelectorAll("main [data-breakout-url]").forEach((element) => {
+      // Avoid mutating the original page
+      const doc = page.document?.cloneNode(true) as Document;
+
+      const urlSuffix = element.getAttribute("data-breakout-url");
+      const breakoutClass = element.getAttribute("data-breakout-class");
+      const breakoutButtonColor = element.getAttribute(
+        "data-breakout-button-color"
+      );
+      const breakoutUrl = page.data.url + urlSuffix ?? "breakout";
+      
+
+      const a = doc.createElement("a");
+      a.setAttribute("href", breakoutUrl);
+      a.textContent = "Open ↗";
+      a.classList.add("breakout-link");
+      element.parentElement?.appendChild(a);
+      // Note element.style seems unavailable
+      element.parentElement?.setAttribute(
+        "style",
+        `--breakout-link-color: ${breakoutButtonColor}`
+      );
+
+      const body = doc?.querySelector("body");
+      if (body) {
+        doc.documentElement.classList.add("breakout", breakoutClass ?? "");
+        body.innerHTML = element.outerHTML;
+        if (breakoutButtonColor) {
+          body.setAttribute(
+            "style",
+            `--breakout-link-color: ${breakoutButtonColor}`
+          );
+        }
+      }
+
+      const demoPage = Page.create({
+        title: page.data.title,
+        url: breakoutUrl,
+        content: doc?.documentElement.outerHTML,
+        layout: "index.vto",
+      });
+      allPages.push(demoPage);
+    });
   });
 
   const readMe = Page.create({
