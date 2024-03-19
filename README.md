@@ -11,3 +11,4 @@ Site content can be found at https://github.com/robstarbuck/content.robstarbuck.
 
 - [Background Image](https://unsplash.com/photos/black-textile-on-black-background-UAbg0py6GYQ)
 - [Colour Scheme Info](https://www.vis4.net/blog/mastering-multi-hued-color-scales/)
+- [Favicons](https://favicon.io/favicon-converter/)
