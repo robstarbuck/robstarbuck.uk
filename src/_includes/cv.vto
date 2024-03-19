@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ title }} | robstarbuck.uk</title>
+  <title>CV {{ date |> date('yyyy-MM-dd') }}</title>
+
+  <style>
+    @media print {
+      title {
+         content: "My Print-Specific Title"; 
+      }
+    }
+  </style>
   <link rel="preconnect" href="https://rsms.me/">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <link rel="stylesheet" href="/font.css">
@@ -11,6 +19,8 @@
   <link rel="stylesheet" href="/vertical-rhythm.css"></link>
   <link rel="stylesheet" href="/index.css"></link>
   <link rel="stylesheet" href="/highlight-js/robstarbuck.uk.css"></link>
+
+  <link rel="stylesheet" href="/cv.css"></link>
 
   <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=.75">
 
@@ -46,8 +56,4 @@
     </a>
   </footer>
 </body>
-<link rel="stylesheet" href="/minireset.css"></link>
-<link rel="stylesheet" href="/vertical-rhythm.css"></link>
-<link rel="stylesheet" href="/index.css"></link>
-<link rel="stylesheet" href="/cv.css"></link>
 </html>

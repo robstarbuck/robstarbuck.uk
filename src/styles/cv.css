@@ -80,9 +80,9 @@ p > strong {
         background: none;
     }
     :root::after, body::after {
-        content: none;
+        content: none !important;
     }
-    nav, footer {
+    nav, footer, .post-script {
         display: none;
     }
     main {

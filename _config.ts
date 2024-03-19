@@ -1,5 +1,6 @@
 import { Page } from "lume/core/file.ts";
 import lume from "lume/mod.ts";
+import dateplugin from "lume/plugins/date.ts";
 import codeHighlight from "lume/plugins/code_highlight.ts";
 import esbuild from "lume/plugins/esbuild.ts";
 
@@ -21,6 +22,8 @@ site.use(
     },
   })
 );
+
+site.use(dateplugin())
 
 const [date, time] = new Date().toISOString().split(/T|\./);
 
