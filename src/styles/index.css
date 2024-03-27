@@ -240,3 +240,18 @@ button.history-back {
     border: 0;
     cursor: pointer;
 }
+
+.colx2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--rh2);
+}
+
+.text {
+    --r-count: 2;
+    --r-factor: 0.75;
+}
+
+.text code {
+    color: var(--shade6);
+}

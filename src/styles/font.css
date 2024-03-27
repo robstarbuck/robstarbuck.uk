@@ -10,14 +10,17 @@ html, button {
 }
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+
+code {
+    font-family: "JetBrains Mono", monospace;
+}
+
 pre code {
     border-radius: calc(var(--r) * 0.25);
     display: block;
     padding: calc(var(--pd) * 0.5);
     color: var(--highlight-color);
     background: var(--highlight-bg);
-    
-    font-family: "JetBrains Mono", monospace;
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
