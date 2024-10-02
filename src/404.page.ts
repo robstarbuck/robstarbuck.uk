@@ -2,18 +2,13 @@ export const layout = "index.vto";
 
 export const title = "404";
 
-export default function (page: Lume.Data) {
-  const posts = page.search.pages("post");
-
+export default function () {
   return `
-    <p>Page Not Found</p>
-    <hr />
-    <ul>
-      ${posts
-        .map((post) => {
-          return `<li><a href="${post.url}">${post.title}</a></li>`;
-        })
-        .join("")}
-    </ul>
-  `;
+    <p>
+      Page Not Found
+      <br />
+      <a href="/">Return Home</a>
+    </p>
+    
+  `
 }

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title || "" }} | robstarbuck.uk</title>
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="stylesheet" href="/font.css">
+
+  <link rel="stylesheet" href="/minireset.css"></link>
+  <link rel="stylesheet" href="/vertical-rhythm.css"></link>
+  <link rel="stylesheet" href="/index.css"></link>
+  <link rel="stylesheet" href="/highlight-js/robstarbuck.uk.css"></link>
+
+  <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=.75">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  {{ for module of modules }}
+  <script type="module" src="{{ module }}"></script>
+  {{ /for }}
+
+  <script defer src="/scripts/back-button.js"></script>
+
+</head>
+<body>
+  <nav>
+    <a href="/">
+      robstarbuck.uk
+    </a>
+  </nav>
+  <main {{ if url == "/" }}class="home"{{ /if }}>
+  {{ if url !== "/" }}
+  <h1>{{ title }}</h1>
+  {{ /if }}
+  {{ content }}
+  </main>
+  <footer>
+    <a href="{{ github }}">
+      {{ comp.logo.github() }}
+      <time datetime="{{ buildDate }} {{ buildTime }}.000">Built {{ buildDate }}</time>
+    </a>
+  </footer>
+</body>
+
+
+</html>

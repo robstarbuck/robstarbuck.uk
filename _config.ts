@@ -192,7 +192,7 @@ site.process([".html"], (pages, allPages) => {
       }
 
       const demoPage = Page.create({
-        title: page.data.title,
+        title: page.data.title ?? "FB",
         url: breakoutUrl,
         content: doc?.documentElement.outerHTML,
         layout: "index.vto",
