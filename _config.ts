@@ -27,6 +27,8 @@ site.use(dateplugin())
 
 const [date, time] = new Date().toISOString().split(/T|\./);
 
+site.data("layout", "layouts/index.vto");
+
 site.data("buildDate", date);
 site.data("buildTime", time);
 
@@ -80,9 +82,13 @@ site.preprocess([".html"], (pages) => {
     if (/posts/.test(page.src.path)) {
       page.data.tags = ["post"];
       if (page.data.layout === undefined) {
-        page.data.layout = "index.vto";
+        page.data.layout = "layouts/index.vto";
       }
     }
+
+    if(page.data.url.startsWith("/invoice")){
+      page.data.layout = "layouts/invoice.vto";
+    };
 
     page.data.modules = page.data.modules ?? [];
 
@@ -96,8 +102,8 @@ site.preprocess([".html"], (pages) => {
       page.data.markdownLink =
         github && repoUrl ? github.concat(repoUrl) : undefined;
 
-      page.data.layout = "cv.vto";
-      page.data.url = "./cv/";
+      page.data.layout = "layouts/cv.vto";
+      page.data.url = "/cv/";
       page.data.tags = ["document", "cv"];
     }
   });
@@ -195,13 +201,15 @@ site.process([".html"], (pages, allPages) => {
         title: page.data.title ?? "FB",
         url: breakoutUrl,
         content: doc?.documentElement.outerHTML,
-        layout: "index.vto",
+        layout: "layouts/index.vto",
       });
+
       allPages.push(demoPage);
     });
   });
 
   const readMe = Page.create({
+    title: "READ ME",
     url: "README.md",
     content: `# Site Build
       - Page Count: ${allPages.length}

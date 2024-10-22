@@ -1,4 +1,4 @@
-export const layout = "index.vto";
+export const layout = "layouts/index.vto";
 
 export const title = "404";
 

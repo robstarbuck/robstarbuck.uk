@@ -202,10 +202,10 @@ footer a {
     background-color: var(--shade6);
 }
 
-main:not(.home, .cv) ol {
+main:not(.home, .paper) ol {
     list-style-position: inside;
 }
-main:not(.home, .cv) ul {
+main:not(.home, .paper) ul {
     list-style: disc;
     list-style-position: inside;
 }

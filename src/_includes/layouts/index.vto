@@ -2,15 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CV {{ date |> date('yyyy-MM-dd') }}</title>
-
-  <style>
-    @media print {
-      title {
-         content: "My Print-Specific Title"; 
-      }
-    }
-  </style>
+  <title>{{ title || "" }} | robstarbuck.uk</title>
   <link rel="preconnect" href="https://rsms.me/">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <link rel="stylesheet" href="/font.css">
@@ -20,14 +12,18 @@
   <link rel="stylesheet" href="/index.css"></link>
   <link rel="stylesheet" href="/highlight-js/robstarbuck.uk.css"></link>
 
-  <link rel="stylesheet" href="/cv.css"></link>
-
   <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=.75">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
+
+  {{ for module of modules }}
+  <script type="module" src="{{ module }}"></script>
+  {{ /for }}
+
+  <script defer src="/scripts/back-button.js"></script>
 
 </head>
 <body>
@@ -36,19 +32,10 @@
       robstarbuck.uk
     </a>
   </nav>
-  <main class="cv">
-    <div class="content">
-    {{ content }}
-    </div>
+  <main {{ if url == "/" }}class="home"{{ /if }}>
+  <h2>{{ title }}</h2>
+  {{ content }}
   </main>
-  <div class="post-script">
-    {{ if pdfLink }}
-    <a href="{{ pdfLink }}">⤓ PDF</a>
-    {{ /if }}
-    {{ if markdownLink }}
-    <a href="{{ markdownLink }}">Markdown</a>
-    {{ /if }}
-  </div>
   <footer>
     <a href="{{ github }}">
       {{ comp.logo.github() }}
@@ -56,4 +43,6 @@
     </a>
   </footer>
 </body>
+
+
 </html>

@@ -57,10 +57,25 @@ h3+h4 {
     font-weight: normal;
 }
 
-p > strong {
+.paper.-cv p > strong {
     font-weight: normal;
 }
 
+.paper.-invoice p {
+    white-space: pre-line;
+}
+
+
+.abs {
+    position: absolute;
+}
+.paper.-invoice header {
+    position: relative;
+    display: flex;
+    height: var(--rh7);
+    margin-bottom: var(--rh5);
+    border-bottom: var(--rh1) solid #F7B500;
+}
 
 @media print {
     * {
@@ -96,6 +111,11 @@ p > strong {
     }
     .content {
         max-width: none;
+    }
+    .footer {
+        position: fixed;
+        right: 0;
+        bottom: 0;
     }
     
 }
