@@ -1,0 +1,45 @@
+:root {
+    /* Vertical Rhythm */
+    --r: 20px;
+    /* One Quarter */
+    --rq: calc(var(--r) * 0.25);
+    /* One Half */
+    --rh: calc(var(--r) * 0.5);
+
+    --rh1: calc(var(--r) * 0.5);
+    --rh2: calc(var(--r) * 1);
+    --rh3: calc(var(--r) * 1.5);
+    --rh4: calc(var(--r) * 2);
+    --rh5: calc(var(--r) * 2.5);
+    --rh6: calc(var(--r) * 3);
+    --rh7: calc(var(--r) * 3.5);
+    --rh8: calc(var(--r) * 4);
+    --rh9: calc(var(--r) * 4.5);
+}
+
+* {
+    font-size: calc(
+        0.655 *
+        var(--r) *
+        var(--r-count, 1)
+    );
+    line-height: calc(
+        var(--r) *
+        var(--r-count, 1) *
+        var(--r-factor, 1)
+    );
+}
+
+h1 {
+    --r-count: 3;
+    --r-factor: 0.75;
+}
+
+h2 {
+    --r-count: 2;
+    --r-factor: 0.75;
+}
+
+h3 {
+    --r-count: 1;
+}
