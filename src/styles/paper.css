@@ -34,11 +34,15 @@ h3 {
     --r-count: 1;
 }
 
-ul {
+ul:nth-of-type(1) {
     position: absolute;
     margin-top: calc(-1 * var(--rh6));
     right: 0;
     text-align: right;
+}
+
+ul:not(:nth-of-type(1)) li {
+    margin-bottom: var(--rh);
 }
 
 [data-id="Education"]~h3, [data-id="Education"]~h4 {
@@ -46,6 +50,10 @@ ul {
     margin: 0 var(--spacer) var(--spacer) 0;
 }
 
+
+h3:has(+h4) {
+    text-transform: uppercase;
+}
 
 h2+h3 {
     display: inline-block;
@@ -55,6 +63,9 @@ h2+h3 {
 h3+h4 {
     display: inline-block;
     font-weight: normal;
+}
+h3:has(+ h4), h3+h4 {
+    margin-bottom: var(--rh);
 }
 
 .paper.-cv p > strong {
@@ -84,7 +95,8 @@ h3+h4 {
         page-break-after: avoid;
         break-inside: avoid;
     }
-    h2:has(a):nth-of-type(5) {
+    h2:has(a):nth-of-type(4),
+    h1:has(a):nth-of-type(11) {
         page-break-before: always;
     }
     h2 {

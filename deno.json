@@ -2,7 +2,7 @@
   "tasks": {
     "lume": "echo \"import 'lume/cli.ts'\" | deno run --unstable -A -",
     "build": "deno task lume",
-    "serve": "deno task lume -s"
+    "serve": "deno run --allow-read --allow-net lume -s"
   },
   "compilerOptions": {
     "types": [
