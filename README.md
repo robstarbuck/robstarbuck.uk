@@ -4,7 +4,7 @@
 
 The site was built with Deno's [Lume](https://lume.land) and ported from a Hugo version of the site.
 
-Site content can be found at https://github.com/robstarbuck/content.robstarbuck.uk
+Site content can be found at https://github.com/robstarbuck/content.robstarbuck.uk.
 
 
 # Links
