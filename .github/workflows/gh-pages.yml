@@ -1,18 +1,16 @@
-name: Publish on GitHub Pages
+name: Build and Deploy to gh-pages branch
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-# Use the recommended permissions for GitHub Pages
+# This permission allows the action to push a commit to the gh-pages branch
 permissions:
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
-  # Build job
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,14 +21,14 @@ jobs:
         with:
           repository: robstarbuck/documents
           path: src/documents
-          ref: main # <-- Explicitly checks out the 'main' branch
+          ref: main # Explicitly checking out the 'main' branch
 
       - name: Checkout Content
         uses: actions/checkout@v4
         with:
           repository: robstarbuck/content.robstarbuck.uk
           path: src/posts
-          ref: main # <-- Also made this explicit for consistency
+          ref: main # Explicitly checking out the 'main' branch
 
       - name: Setup Deno environment
         uses: denoland/setup-deno@v1
@@ -40,27 +38,13 @@ jobs:
       - name: Build site
         run: deno task build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: crazy-max/ghaction-github-pages@v4
         with:
-          # This should be the output directory from your build script
-          path: '_site'
-
-  # Deployment job
-  deploy:
-    # Requires the build job to be successful
-    needs: build
-    runs-on: ubuntu-latest
-    
-    # Specifies the deployment environment
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          # The branch you want to deploy to
+          target_branch: gh-pages
+          # The directory the action should deploy
+          build_dir: _site
+        env:
+          # The GITHUB_TOKEN is automatically created by GitHub
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
