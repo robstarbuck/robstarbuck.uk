@@ -1,4 +1,3 @@
-
 name: Publish on GitHub Pages
 
 on:
@@ -6,17 +5,15 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Use the recommended permissions for GitHub Pages
 permissions:
   pages: write
   id-token: write
-  contents: write
-  pull-requests: write
 
 jobs:
+  # Build job
   build:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,13 +23,15 @@ jobs:
         with:
           repository: robstarbuck/documents
           path: src/documents
+          ref: main # <-- Explicitly checks out the 'main' branch
 
       - name: Checkout Content
         uses: actions/checkout@v4
         with:
           repository: robstarbuck/content.robstarbuck.uk
           path: src/posts
-          
+          ref: main # <-- Also made this explicit for consistency
+
       - name: Setup Deno environment
         uses: denoland/setup-deno@v1
         with:
@@ -40,20 +39,28 @@ jobs:
 
       - name: Build site
         run: deno task build
-      
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          # This should be the output directory from your build script
           path: '_site'
 
-      - name: Deploy to gh-pages
-        uses: crazy-max/ghaction-github-pages@v4
-        if: ${{ github.ref == 'refs/heads/main' }}
-        with:
-          target_branch: gh-pages
-          build_dir: ./_site
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Deployment job
+  deploy:
+    # Requires the build job to be successful
+    needs: build
+    runs-on: ubuntu-latest
+    
+    # Specifies the deployment environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
