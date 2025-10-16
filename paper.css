@@ -1,0 +1,137 @@
+:root {
+    --spacer: calc(var(--r) / 4);
+}
+
+main {
+    padding-top: var(--rh5);
+    padding-right: var(--rh4);
+    padding-bottom: var(--rh6);
+    padding-left: var(--rh8);
+}
+
+#cv-footer {
+    display:flex;
+    justify-content: end;
+    padding: var(--r) 0;
+    gap: var(--r);
+}
+
+#cv-footer a {
+    box-shadow: none;
+}
+
+h1 {
+    --r-count: 2;
+    --r-factor: 0.75;
+}
+
+h2 {
+    --r-count: 1.5;
+    --r-factor: 0.75;
+}
+
+h3 {
+    --r-count: 1;
+}
+
+ul:nth-of-type(1) {
+    position: absolute;
+    margin-top: calc(-1 * var(--rh6));
+    right: 0;
+    text-align: right;
+}
+
+ul:not(:nth-of-type(1)) li {
+    margin-bottom: var(--rh);
+}
+
+[data-id="Education"]~h3, [data-id="Education"]~h4 {
+    display: inline-block;
+    margin: 0 var(--spacer) var(--spacer) 0;
+}
+
+
+h3:has(+h4) {
+    text-transform: uppercase;
+}
+
+h2+h3 {
+    display: inline-block;
+    margin-right: var(--spacer);
+}
+
+h3+h4 {
+    display: inline-block;
+    font-weight: normal;
+}
+h3:has(+ h4), h3+h4 {
+    margin-bottom: var(--rh);
+}
+
+.paper.-cv p > strong {
+    font-weight: normal;
+}
+
+.paper.-invoice p {
+    white-space: pre-line;
+}
+
+
+.abs {
+    position: absolute;
+}
+.paper.-invoice header {
+    position: relative;
+    display: flex;
+    height: var(--rh7);
+    margin-bottom: var(--rh5);
+    border-bottom: var(--rh1) solid #F7B500;
+}
+
+@media print {
+    * {
+        box-shadow: none !important;
+        page-break-before: avoid;
+        page-break-after: avoid;
+        break-inside: avoid;
+    }
+    h2:has(a):nth-of-type(4),
+    h1:has(a):nth-of-type(11) {
+        page-break-before: always;
+    }
+    h2 {
+        page-break-before: auto;
+        break-inside: auto;
+    }
+    :root, body {
+        background: none;
+    }
+    :root::after, body::after {
+        content: none !important;
+    }
+    nav, footer, .post-script {
+        display: none;
+    }
+    main {
+        padding: 0;
+    }
+    :root {
+        --r: 22px;
+    }
+    body {
+        padding: 0;
+    }
+    .content {
+        max-width: none;
+    }
+    .footer {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+    }
+    
+}
+
+@page {
+    margin: 2cm 1.5cm 1.5cm 2.5cm;
+}
