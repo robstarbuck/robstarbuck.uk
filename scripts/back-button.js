@@ -1,0 +1,1 @@
+var t=document.body;if(t&&document.documentElement.classList.contains("breakout")&&document.referrer&&window.location.href.includes(document.referrer)){let e=document.createElement("button");e.textContent="\u2199 Back",e.classList.add("breakout-back"),e.addEventListener("click",()=>history.back()),t.prepend(e)}

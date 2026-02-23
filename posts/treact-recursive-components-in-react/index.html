@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <title>Treact - Recursive Components in React | robstarbuck.uk</title>
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="stylesheet" href="/font.css">
+
+  <link rel="stylesheet" href="/minireset.css">
+  <link rel="stylesheet" href="/vertical-rhythm.css">
+  <link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/highlight-js/robstarbuck.uk.css">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=.75">
+
+  <meta name="view-transition" content="same-origin">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+
+  
+
+  <script defer="" src="/scripts/back-button.js"></script>
+
+</head>
+<body>
+  <nav>
+    <a href="/">
+      robstarbuck.uk
+    </a>
+  </nav>
+  <main>
+  <h2>Treact - Recursive Components in React</h2>
+  <p>React is ideally suited to the task of creating <a href="https://en.wikipedia.org/wiki/Tree_(data_structure)" target="_blank">trees</a>, being at its core, a tree of functions that call one another. In this demo we’ll look at creating a tree using a data set containing trees (of the Kingdom Plantae). So the theme is trees.</p>
+<p>Here’s the <a href="https://robstarbuck.github.io/treact/" target="_blank">demo</a> that we are working towards.</p>
+<div class="iframe" style="--breakout-link-color: #0d95c0"><iframe src="https://robstarbuck.github.io/treact/" title="Treact" style="aspect-ratio: 4 / 3" data-breakout-url="employboy-demo" data-breakout-class="full-page-iframe" data-breakout-button-color="#0d95c0" <blockquote=""></blockquote>
+</iframe><a href="/posts/treact-recursive-components-in-react/employboy-demo.html" class="breakout-link">Open ↗</a></div>
+<h2>Flat vs Nested Data</h2>
+<p>As our subject is trees it’s their taxonomic rank that we’ll be exploring. There are many but we'll be using only a subset:</p>
+<pre><code>1. Kingdom
+2. Order
+3. Family
+4. Genus
+5. Species (or Common Name)
+</code></pre>
+<p>So an ash tree would come out as</p>
+<pre><code>1. Plantae
+	2. Lamiales
+		3. Oleaceae
+			4. Fraxinus
+				5. Fraxinus excelsior (Ash)
+</code></pre>
+<p>One common way to represent tree data is to nest the containing information.</p>
+<pre><code class="language-json hljs"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"taxon"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Kingdom"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"value"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Plantae"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"children"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+      <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">"taxon"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Order"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"value"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Lamiales"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"children"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+          <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">"taxon"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Family"</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">"value"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Oleaceae"</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">"children"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+              <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">"taxon"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Genus"</span><span class="hljs-punctuation">,</span>
+                <span class="hljs-attr">"value"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Fraxinus"</span><span class="hljs-punctuation">,</span>
+                <span class="hljs-attr">"children"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+                  <span class="hljs-punctuation">{</span>
+                    <span class="hljs-attr">"taxon"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Species"</span><span class="hljs-punctuation">,</span>
+                    <span class="hljs-attr">"value"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Fraxinus excelsior"</span><span class="hljs-punctuation">,</span>
+                    <span class="hljs-attr">"children"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span>
+                  <span class="hljs-punctuation">}</span>
+                <span class="hljs-punctuation">]</span>
+              <span class="hljs-punctuation">}</span>
+            <span class="hljs-punctuation">]</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">]</span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span>
+</code></pre>
+<p>Whilst this seems a natural fit it has many disadvantages.</p>
+<ul>
+<li><strong>1.</strong> The shape of the data is hard to work with, finding a leaf node (a tree) requires recursion.</li>
+<li><strong>2.</strong> Each datum has no idea of its context, eg a species only knows its genus by knowing its parent.</li>
+<li><strong>3.</strong> The hierarchy is very rigid, if we only want to look at everything beneath families we still need to go through the root <em>Plantae</em>.</li>
+</ul>
+<p>A more flexible approach is to keep our data flat. In this instance we already know the levels of our tree (the taxonomic ranks we’ll be using), this might not be true for other trees. A family tree for example could span any number of generations. Here however our levels are known to us in advance (those being Kingdom, Order, Family, Genus, Species)</p>
+<p>As such the Ash tree can be easily represented:</p>
+<pre><code class="language-json hljs"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"Kingdom"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Plantae"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"Order"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Lamiales"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"Family"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Oleaceae"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"Genus"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Fraxinus"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"Species"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Fraxinus excelsior"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Certainly much easier to grok from my point of view and I’ll demonstrate further advantages later on. With our data model agreed upon (well I’m happy with it), let’s render it out in React.</p>
+<h2>A Basic Implementation</h2>
+<p>We can get a basic implementation working in 50 or so (readable) lines of Typescript.</p>
+<pre><code class="language-jsx hljs language-javascript">
+<span class="hljs-keyword">import</span> <span class="hljs-string">"./App.css"</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">FC</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>;
+<span class="hljs-keyword">import</span> allTrees <span class="hljs-keyword">from</span> <span class="hljs-string">"./data.json"</span>;
+
+<span class="hljs-comment">// Types</span>
+type <span class="hljs-title class_">Tree</span> = <span class="hljs-keyword">typeof</span> allTrees[number];
+type <span class="hljs-title class_">TaxonomicRank</span> = keyof <span class="hljs-title class_">Tree</span>;
+type <span class="hljs-title class_">TaxonomyProps</span> = { <span class="hljs-attr">children</span>: <span class="hljs-title class_">Array</span>&lt;<span class="hljs-title class_">Tree</span>&gt;; <span class="hljs-attr">rank</span>: <span class="hljs-title class_">TaxonomicRank</span> }
+
+<span class="hljs-comment">// This is only a subset of - domain, kingdom, phylum, class, order, family, genus, species</span>
+<span class="hljs-keyword">const</span> <span class="hljs-attr">taxonomicRanks</span>: <span class="hljs-title class_">Array</span>&lt;<span class="hljs-title class_">TaxonomicRank</span>&gt; = [
+  <span class="hljs-string">"Kingdom"</span>,
+  <span class="hljs-string">"Order"</span>,
+  <span class="hljs-string">"Family"</span>,
+  <span class="hljs-string">"Genus"</span>,
+  <span class="hljs-string">"Species"</span>
+];
+
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">renderTaxon</span> = (<span class="hljs-params">taxon</span>) =&gt; {
+
+  <span class="hljs-comment">// We are only passing the taxa of this rank to the next Taxonomy</span>
+  <span class="hljs-comment">// Without this filter, the component will call itself indefinitely</span>
+
+  <span class="hljs-keyword">const</span> childrenOfTaxon = children.<span class="hljs-title function_">filter</span>(
+    <span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span> t[rank] === taxon[rank]
+  );
+
+  <span class="hljs-keyword">const</span> subRank = taxonomicRanks.<span class="hljs-title function_">at</span>(taxonomicRanks.<span class="hljs-title function_">indexOf</span>(rank) + <span class="hljs-number">1</span>);
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">details</span> <span class="hljs-attr">open</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">summary</span>&gt;</span>
+        {taxon[rank]}
+      <span class="hljs-tag">&lt;/<span class="hljs-name">summary</span>&gt;</span>
+
+      {/* Here the element now calls itself */}
+
+      {subRank &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">Taxonomy</span> <span class="hljs-attr">rank</span>=<span class="hljs-string">{subRank}</span>&gt;</span>{childrenOfTaxon}<span class="hljs-tag">&lt;/<span class="hljs-name">Taxonomy</span>&gt;</span>}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">details</span>&gt;</span></span>
+  );
+}
+
+<span class="hljs-comment">// Our recursive taxonomy which calls itself where child taxonomies exist</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Taxonomy</span>: <span class="hljs-variable constant_">FC</span>&lt;<span class="hljs-title class_">TaxonomyProps</span>&gt; = <span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> { children, rank } = props;
+
+  <span class="hljs-comment">// Find the unique taxa in our child taxonomies</span>
+  <span class="hljs-comment">// EG unique taxa with a key of "Genus"</span>
+  <span class="hljs-keyword">const</span> taxaInRank = children.<span class="hljs-property">reduce</span>&lt;<span class="hljs-title class_">Array</span>&lt;<span class="hljs-title class_">Tree</span>&gt;&gt;(<span class="hljs-function">(<span class="hljs-params">a, c</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (a.<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">v</span>) =&gt;</span> v[rank] === c[rank])) {
+      <span class="hljs-keyword">return</span> a;
+    }
+    <span class="hljs-keyword">return</span> [...a, c];
+  }, []);
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+      {/* Loop through the taxa in the rank */}
+      {taxaInRank.map(renderTaxon)}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+  );
+};
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">App</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"App"</span>&gt;</span>
+      {/* Our initial call to our Taxonomy */}
+      <span class="hljs-tag">&lt;<span class="hljs-name">Taxonomy</span> <span class="hljs-attr">rank</span>=<span class="hljs-string">{taxonomicRanks[0]}</span>&gt;</span>{allTrees}<span class="hljs-tag">&lt;/<span class="hljs-name">Taxonomy</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+  );
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">App</span>;
+</code></pre>
+<p>Here’s the same code on <a href="https://github.com/robstarbuck/treact/blob/basic/src/App.tsx" target="_blank">github</a>.</p>
+<p>With minimal CSS we already have our tree rendering every level of our taxa up to the tree itself, our leaf node.</p>
+<p><div class="image"><img src="basic-screenshot.png" alt="Basic Screenshot"></div></p>
+<h2>Improvements</h2>
+<p>Because we’ve kept our schema flat by abstracting the keys (in this case taxonomic ranks) we can modify which taxonomic ranks we view. Currently we are recursing through "Kingdom", "Order", "Family", "Genus", "Species”. If we only want to observe the “Species” though, this can easily be achieved by passing it in to our initial Taxonomy.</p>
+<pre><code class="language-tsx hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">App</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> rank = <span class="hljs-string">"Species"</span>;
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"App"</span>&gt;</span>
+      {/* Our initial call to our Taxonomy */}
+      <span class="hljs-tag">&lt;<span class="hljs-name">Taxonomy</span> <span class="hljs-attr">rank</span>=<span class="hljs-string">{rank}</span>&gt;</span>{allTrees}<span class="hljs-tag">&lt;/<span class="hljs-name">Taxonomy</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<p>With this in mind, it’s easy to see how <code>rank</code> may be stateful, allowing users to limit the ranks being viewed.</p>
+<p>We can also opt to observe different keys of our trees, for instance Species is probably not all that useful to most people who know trees by their common names.</p>
+<pre><code class="language-json hljs"><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"Name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Ash"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"Species"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Fraxinus excelsior"</span>
+    <span class="hljs-comment">// ...</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Again, this is easily toggled by switching between two different taxa.</p>
+<pre><code class="language-tsx hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-attr">taxaByName</span>: <span class="hljs-title class_">Array</span>&lt;<span class="hljs-title class_">TaxonomicRank</span>&gt; = [
+  <span class="hljs-string">"Kingdom"</span>,
+  <span class="hljs-string">"Order"</span>,
+  <span class="hljs-string">"Family"</span>,
+  <span class="hljs-string">"Genus"</span>,
+  <span class="hljs-string">"Name"</span>,
+];
+
+<span class="hljs-keyword">const</span> <span class="hljs-attr">taxaBySpecies</span>: <span class="hljs-title class_">Array</span>&lt;<span class="hljs-title class_">TaxonomicRank</span>&gt; = [
+  <span class="hljs-string">"Kingdom"</span>,
+  <span class="hljs-string">"Order"</span>,
+  <span class="hljs-string">"Family"</span>,
+  <span class="hljs-string">"Genus"</span>,
+  <span class="hljs-string">"Species"</span>,
+];
+</code></pre>
+<p>The complete source code for this project can be found in the <a href="https://github.com/robstarbuck/treact/" target="_blank">repo</a>.</p>
+<h2>Summary</h2>
+<p>Even when everything in your repo is screaming “TREE!” keeping data flat can may prove more flexible. In this instance we knew our groups in advance, where this might not be the case extra keys might indicate relationships between nodes.</p>
+<pre><code class="language-json hljs"><span class="hljs-punctuation">[</span>
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"LETOTHEJUST"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"fatherId"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"THEOLDDUKE"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Leto Attreides"</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"MUADDIB"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"fatherId"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"LETOTHEJUST"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Paul Attreides"</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"STALIAOFTHEKNIFE"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"fatherId"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"LETOTHEJUST"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Alia Attreides"</span>
+    <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span>
+</code></pre>
+<p>Of course in an ordinary family tree there is more than one parent, I’ll skip over that.</p>
+<p>Owing to React's nature Recursive Components are a good use case for the language and implementations that I’ve seen in Vue and Angular aren’t quite as comprehensive.</p>
+<h2>Links</h2>
+<ul>
+<li><a href="https://github.com/robstarbuck/treact/" target="_blank">Source Code</a></li>
+</ul>
+
+  </main>
+  <footer>
+    <a href="https://github.com/robstarbuck">
+      <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+
+<svg width="100%" height="100%" viewbox="0 0 1501 406" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" space="preserve" xmlns:serif="http://www.serif.com/" style="fill: #2b2031;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M177.281,41.988L147.014,41.988C146.233,41.988 145.6,42.622 145.6,43.403L145.6,58.201C145.6,58.982 146.233,59.618 147.014,59.618L158.821,59.618L158.821,78.003C158.821,78.003 156.17,78.907 148.84,78.907C140.193,78.907 128.113,75.747 128.113,49.183C128.113,22.614 140.692,19.118 152.501,19.118C162.724,19.118 167.127,20.918 169.93,21.785C170.811,22.055 171.625,21.178 171.625,20.397L175.001,6.099C175.001,5.733 174.877,5.293 174.461,4.994C173.323,4.182 166.38,0.297 148.84,0.297C128.634,0.297 107.908,8.894 107.908,50.219C107.908,91.545 131.638,97.704 151.635,97.704C168.192,97.704 178.236,90.628 178.236,90.628C178.65,90.4 178.695,89.821 178.695,89.556L178.695,43.403C178.695,42.622 178.062,41.988 177.281,41.988Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M333.265,5.249C333.265,4.462 332.641,3.826 331.859,3.826L314.817,3.826C314.039,3.826 313.406,4.462 313.406,5.249C313.406,5.253 313.411,38.183 313.411,38.183L286.846,38.183L286.846,5.249C286.846,4.462 286.22,3.826 285.44,3.826L268.399,3.826C267.624,3.826 266.991,4.462 266.991,5.249L266.991,94.427C266.991,95.213 267.624,95.853 268.399,95.853L285.44,95.853C286.22,95.853 286.846,95.213 286.846,94.427L286.846,56.282L313.411,56.282C313.411,56.282 313.364,94.424 313.364,94.427C313.364,95.213 313.996,95.853 314.776,95.853L331.858,95.853C332.639,95.853 333.263,95.213 333.265,94.427L333.265,5.249Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M209.44,16.951C209.44,10.815 204.521,5.856 198.451,5.856C192.387,5.856 187.463,10.815 187.463,16.951C187.463,23.081 192.387,28.054 198.451,28.054C204.521,28.054 209.44,23.081 209.44,16.951Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M208.222,93.564L208.222,34.45C208.222,33.669 207.591,33.03 206.812,33.03L189.823,33.03C189.044,33.03 188.347,33.833 188.347,34.615L188.347,93.592C188.347,95.325 189.427,95.84 190.824,95.84L206.13,95.84C207.81,95.84 208.222,95.016 208.222,93.564Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M398.032,33.164L381.121,33.164C380.346,33.164 379.714,33.803 379.714,34.59L379.714,78.316C379.714,78.316 375.417,81.46 369.319,81.46C363.222,81.46 361.604,78.693 361.604,72.722L361.604,34.59C361.604,33.803 360.974,33.164 360.197,33.164L343.033,33.164C342.259,33.164 341.624,33.803 341.624,34.59L341.624,75.609C341.624,93.344 351.508,97.683 365.105,97.683C376.261,97.683 385.255,91.52 385.255,91.52C385.255,91.52 385.683,94.768 385.877,95.153C386.07,95.537 386.575,95.925 387.121,95.925L398.04,95.877C398.814,95.877 399.449,95.237 399.449,94.453L399.443,34.59C399.443,33.803 398.812,33.164 398.032,33.164Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M437.584,81.406C431.718,81.227 427.739,78.565 427.739,78.565L427.739,50.325C427.739,50.325 431.664,47.919 436.48,47.489C442.57,46.943 448.438,48.783 448.438,63.31C448.438,78.63 445.79,81.653 437.584,81.406ZM444.254,31.161C434.649,31.161 428.116,35.446 428.116,35.446L428.116,5.249C428.116,4.462 427.486,3.826 426.71,3.826L409.619,3.826C408.842,3.826 408.211,4.462 408.211,5.249L408.211,94.427C408.211,95.213 408.842,95.853 409.621,95.853L421.479,95.853C422.013,95.853 422.417,95.578 422.716,95.096C423.011,94.617 423.436,90.984 423.436,90.984C423.436,90.984 430.424,97.607 443.653,97.607C459.185,97.607 468.092,89.729 468.092,62.241C468.092,34.753 453.866,31.161 444.254,31.161Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M257.202,33.022L244.418,33.022C244.418,33.022 244.399,16.137 244.399,16.133C244.399,15.494 244.069,15.174 243.33,15.174L225.91,15.174C225.232,15.174 224.869,15.473 224.869,16.123L224.869,33.576C224.869,33.576 216.139,35.683 215.548,35.853C214.961,36.024 214.528,36.566 214.528,37.213L214.528,48.18C214.528,48.968 215.158,49.604 215.937,49.604L224.869,49.604L224.869,75.989C224.869,95.585 238.615,97.51 247.89,97.51C252.129,97.51 257.199,96.149 258.036,95.84C258.542,95.654 258.836,95.13 258.836,94.561L258.851,82.497C258.851,81.71 258.186,81.073 257.437,81.073C256.691,81.073 254.787,81.376 252.825,81.376C246.545,81.376 244.418,78.457 244.418,74.678C244.418,70.901 244.417,49.604 244.417,49.604L257.202,49.604C257.98,49.604 258.612,48.968 258.612,48.18L258.612,34.443C258.612,33.656 257.98,33.022 257.202,33.022Z" style="fill-rule:nonzero;"></path>
+    </g>
+</svg>
+
+      <time datetime="2026-02-23 15:04:15.000">Built 2026-02-23</time>
+    </a>
+  </footer>
+
+
+
+
+</body></html>

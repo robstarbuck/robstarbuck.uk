@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <title>Steganography with Zero Width Characters (Z-Chars) | robstarbuck.uk</title>
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="stylesheet" href="/font.css">
+
+  <link rel="stylesheet" href="/minireset.css">
+  <link rel="stylesheet" href="/vertical-rhythm.css">
+  <link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/highlight-js/robstarbuck.uk.css">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=.75">
+
+  <meta name="view-transition" content="same-origin">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+
+  
+
+  <script defer="" src="/scripts/back-button.js"></script>
+
+</head>
+<body>
+  <nav>
+    <a href="/">
+      robstarbuck.uk
+    </a>
+  </nav>
+  <main>
+  <h2>Steganography with Zero Width Characters (Z-Chars)</h2>
+  <div class="image"><img src="https://user-images.githubusercontent.com/5805251/156551854-29ef4800-e455-4e86-bb98-deef7dd0d6b7.svg" style="width: 100%;height: 320px"></div>
+<p><strong>Steganography the practice of hiding a message in something that is not secret. Certain unicode characters are zero-width, meaning that they won't be printed and can't be seen. Using these character we can encode characters and hide messages.</strong></p>
+<p>In this post I'll provide a quick explanation of some of the key aspects of <a href="https://robstarbuck.github.io/z-chars-demo/" target="_blank">Z-Chars</a>. The post might interest Javascript devs who are curious about unicode and the bidirectional algorithm.</p>
+<p><strong>POLITE NOTICE</strong> There's enough trash on the web without hidden characters gumming up our messages, please don't use this in the wild.</p>
+<h2>Hiding characters in text</h2>
+<p>Wherever text is represented digitally, it's likely to be encoded using Unicode. Some Unicode characters are intentionally invisible, a carriage return for example (<code>↵</code>) can't be seen although we can see it's effect. Such characters are known as <a href="https://en.wikipedia.org/wiki/Control_character" target="_blank">control characters</a>.</p>
+<p>Because not all languages read from left to right, some require special mark-up to ensure they run from right to left. Take the word "Egypt" as an example.</p>
+<div class="colx2">
+    <figure>
+        <div class="text">Egypt</div>
+        <code>⟶</code>
+        <figcaption>Latin characters read left to right</figcaption>
+    </figure>
+    <figure>
+        <div class="text">مصر</div>
+        <code>⟵</code>
+        <figcaption>Arabic characters read right to left</figcaption>
+    </figure>
+</div>
+<p>Computers need to know which direction these characters run in and one way to indicate this is with control characters.</p>
+<p>There are nine such characters as specified in the <a href="http://www.unicode.org/reports/tr9/" target="_blank">Unicode Bidirectional Algorithm</a>. The nine characters are:</p>
+<pre><code>U+2066   LEFT-TO-RIGHT ISOLATE
+U+2067   RIGHT-TO-LEFT ISOLATE
+U+2068   FIRST-STRONG ISOLATE
+U+202A   LEFT-TO-RIGHT EMBEDDING
+U+202B   RIGHT-TO-LEFT EMBEDDING
+U+202D   LEFT-TO-RIGHT OVERRIDE
+U+202E   RIGHT-TO-LEFT OVERRIDE
+
+U+202C   POP DIRECTIONAL FORMATTING
+U+2069   POP DIRECTIONAL ISOLATE
+</code></pre>
+<p>I'm not going to be digging much into the details but hopefully the names alone provide some indication of their use. Let's explore how they'll print in the browser. We'll be using the UTF-16 reference listed above. In JS we can access these characters with <code>'\uCODE'</code>. The letter "A" for example is <code>'\u0041'</code>.</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-string">'\u0041'</span>
+<span class="hljs-comment">// "A"</span>
+
+<span class="hljs-string">'\u0041\u0042\u0043'</span>
+<span class="hljs-comment">// "ABC"</span>
+
+<span class="hljs-string">'\u2066\u2067\u2068\u202A\u202B\u202D\u202E\u202C\u2069'</span>
+<span class="hljs-comment">// "" [Nothing is visible]</span>
+</code></pre>
+<p>As you can see, our nine characters print as an empty string "". Now let's try to insert these characters between other letters.</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-string">'A'</span> +
+<span class="hljs-string">'\u2066\u202A\u202D'</span> +
+<span class="hljs-string">'B'</span> +
+<span class="hljs-string">'\u2066\u202A\u202D'</span> +
+<span class="hljs-string">'C'</span>
+<span class="hljs-comment">// "A⁦‪‭B⁦‪‭C"</span>
+</code></pre>
+<p>Again the control characters between the letters can't be seen.</p>
+<p>Because the assumed use for this is hiding characters in the latin alphabet, we know the text will always run left to right, to guarantee this it's safest to limit ourselves to the three left-to-right control characters:</p>
+<pre><code>U+2066   LEFT-TO-RIGHT ISOLATE
+U+202A   LEFT-TO-RIGHT EMBEDDING
+U+202D   LEFT-TO-RIGHT OVERRIDE
+</code></pre>
+<p>We now have the means to hide characters, all we need now is a way to encode them to other characters.</p>
+<h2>Encoding and Decoding</h2>
+<p>So we have our three characters with which we can encode our hidden letters and this is great because if you have an understanding of binary, you'll know that we only need two <code>0</code> and <code>1</code>. Let's see how we can use these two characters to represent the letter "X".</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-string">"X"</span>.<span class="hljs-title function_">charCodeAt</span>(<span class="hljs-number">0</span>)
+<span class="hljs-comment">// 88</span>
+<span class="hljs-string">"X"</span>.<span class="hljs-title function_">charCodeAt</span>(<span class="hljs-number">0</span>).<span class="hljs-title function_">toString</span>(<span class="hljs-number">2</span>);
+<span class="hljs-comment">// "1011000"</span>
+</code></pre>
+<p><code>charCodeAt</code> gives us the unicode character reference for our letter, <code>toString(2)</code> then converts this to a binary string or a number with a base of 2. To get back to our "X" we can use <code>fromCodePoint</code> to reverse the process.</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-built_in">parseInt</span>(<span class="hljs-string">"1011000"</span>,<span class="hljs-number">2</span>)
+<span class="hljs-comment">// 88</span>
+<span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCodePoint</span>(<span class="hljs-number">88</span>)
+<span class="hljs-comment">// "X"</span>
+<span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCodePoint</span>(<span class="hljs-built_in">parseInt</span>(<span class="hljs-string">"1011000"</span>,<span class="hljs-number">2</span>))
+<span class="hljs-comment">// "X"</span>
+</code></pre>
+<p>Because we know we can represent "X" using 0 and 1, it's a short step to swapping these characters out to the control characters that can't be seen.</p>
+<pre><code>1 =&gt; U+2066
+0 =&gt; U+202A
+1 =&gt; U+2066
+1 =&gt; U+2066
+0 =&gt; U+202A
+0 =&gt; U+202A
+0 =&gt; U+202A
+</code></pre>
+<p>So an X hidden between A and B might look like this:</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-string">'A'</span>+<span class="hljs-string">'\u2066\u202A\u2066\u2066\u202A\u202A\u202A'</span>+<span class="hljs-string">'B'</span>
+<span class="hljs-comment">// A⁦‪⁦⁦‪⁦‪B</span>
+</code></pre>
+<p>Because we have three characters however, it makes sense to use them all. This changes our base (or radix) to three. Encoding and decoding three characters look like this:</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-comment">// ENCODING</span>
+
+<span class="hljs-string">"X"</span>.<span class="hljs-title function_">charCodeAt</span>(<span class="hljs-number">0</span>)
+<span class="hljs-comment">// 88</span>
+<span class="hljs-string">"X"</span>.<span class="hljs-title function_">charCodeAt</span>(<span class="hljs-number">0</span>).<span class="hljs-title function_">toString</span>(<span class="hljs-number">3</span>);
+<span class="hljs-comment">// "10021" [Comprises three characters 0,1 and 2]</span>
+
+<span class="hljs-comment">// DECODING</span>
+
+<span class="hljs-built_in">parseInt</span>(<span class="hljs-string">"10021"</span>,<span class="hljs-number">3</span>)
+<span class="hljs-comment">// 88</span>
+<span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCodePoint</span>(<span class="hljs-number">88</span>)
+<span class="hljs-comment">// "X"</span>
+<span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCodePoint</span>(<span class="hljs-built_in">parseInt</span>(<span class="hljs-string">"10021"</span>,<span class="hljs-number">3</span>))
+<span class="hljs-comment">// "X"</span>
+</code></pre>
+<p>Let's take another example by hiding "HIDDEN" within the word "VISIBLE". Because our z-chars fit between our visible letters, the number of characters we can encode is the number of visible letters minus one. So our visible letters demark our hidden ones.</p>
+<p>Here's a visualisation of the encoding:</p>
+<div>
+<figure>
+    <span class="text">V‭‭⁦⁦I‭‭⁦‪S‭‪‪‭I‭‪‪‭B‭‪‭⁦L‭‭‭⁦E⁩</span>
+    <figcaption>Characters represented by zero-width characters</figcaption>
+</figure>
+<figure>
+    <span class="text">V<code>2200</code>I<code>2201</code>S<code>2112</code>I<code>2112</code>B<code>2120</code>L<code>2220</code>E</span>
+    <figcaption>Characters represented by 0,1,2</figcaption>
+</figure>
+<figure>
+    <span class="text">V<code>H</code>I<code>I</code>S<code>D</code>I<code>D</code>B<code>E</code>L<code>N</code>E</span>
+    <figcaption>Characters decoded</figcaption>
+</figure>
+</div>
+<h2>Summary</h2>
+<p>Other than a few functions to split strings and interpolate the hidden characters, this all but covers the core concepts behind Z-Chars. Pray you never use them to this effect.</p>
+<p>Please take a look through the <a href="https://github.com/robstarbuck/z-chars" target="_blank">source code</a> if you're curiouser still.</p>
+<h2>Links</h2>
+<ul>
+<li><a href="https://dmitripavlutin.com/what-every-javascript-developer-should-know-about-unicode/" target="_blank">What every JavaScript developer should know about Unicode</a></li>
+<li><a href="https://www.w3.org/International/articles/inline-bidi-markup/" target="_blank">An introduction to bidi markup</a></li>
+<li><a href="http://www.unicode.org/reports/tr9/" target="_blank">Unicode Bidirectional Algorithm</a></li>
+<li><a href="https://www.youtube.com/watch?v=wL1HnDGTAK8" target="_blank">Z Cars theme music</a></li>
+</ul>
+
+  </main>
+  <footer>
+    <a href="https://github.com/robstarbuck">
+      <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+
+<svg width="100%" height="100%" viewbox="0 0 1501 406" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" space="preserve" xmlns:serif="http://www.serif.com/" style="fill: #2b2031;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M177.281,41.988L147.014,41.988C146.233,41.988 145.6,42.622 145.6,43.403L145.6,58.201C145.6,58.982 146.233,59.618 147.014,59.618L158.821,59.618L158.821,78.003C158.821,78.003 156.17,78.907 148.84,78.907C140.193,78.907 128.113,75.747 128.113,49.183C128.113,22.614 140.692,19.118 152.501,19.118C162.724,19.118 167.127,20.918 169.93,21.785C170.811,22.055 171.625,21.178 171.625,20.397L175.001,6.099C175.001,5.733 174.877,5.293 174.461,4.994C173.323,4.182 166.38,0.297 148.84,0.297C128.634,0.297 107.908,8.894 107.908,50.219C107.908,91.545 131.638,97.704 151.635,97.704C168.192,97.704 178.236,90.628 178.236,90.628C178.65,90.4 178.695,89.821 178.695,89.556L178.695,43.403C178.695,42.622 178.062,41.988 177.281,41.988Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M333.265,5.249C333.265,4.462 332.641,3.826 331.859,3.826L314.817,3.826C314.039,3.826 313.406,4.462 313.406,5.249C313.406,5.253 313.411,38.183 313.411,38.183L286.846,38.183L286.846,5.249C286.846,4.462 286.22,3.826 285.44,3.826L268.399,3.826C267.624,3.826 266.991,4.462 266.991,5.249L266.991,94.427C266.991,95.213 267.624,95.853 268.399,95.853L285.44,95.853C286.22,95.853 286.846,95.213 286.846,94.427L286.846,56.282L313.411,56.282C313.411,56.282 313.364,94.424 313.364,94.427C313.364,95.213 313.996,95.853 314.776,95.853L331.858,95.853C332.639,95.853 333.263,95.213 333.265,94.427L333.265,5.249Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M209.44,16.951C209.44,10.815 204.521,5.856 198.451,5.856C192.387,5.856 187.463,10.815 187.463,16.951C187.463,23.081 192.387,28.054 198.451,28.054C204.521,28.054 209.44,23.081 209.44,16.951Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M208.222,93.564L208.222,34.45C208.222,33.669 207.591,33.03 206.812,33.03L189.823,33.03C189.044,33.03 188.347,33.833 188.347,34.615L188.347,93.592C188.347,95.325 189.427,95.84 190.824,95.84L206.13,95.84C207.81,95.84 208.222,95.016 208.222,93.564Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M398.032,33.164L381.121,33.164C380.346,33.164 379.714,33.803 379.714,34.59L379.714,78.316C379.714,78.316 375.417,81.46 369.319,81.46C363.222,81.46 361.604,78.693 361.604,72.722L361.604,34.59C361.604,33.803 360.974,33.164 360.197,33.164L343.033,33.164C342.259,33.164 341.624,33.803 341.624,34.59L341.624,75.609C341.624,93.344 351.508,97.683 365.105,97.683C376.261,97.683 385.255,91.52 385.255,91.52C385.255,91.52 385.683,94.768 385.877,95.153C386.07,95.537 386.575,95.925 387.121,95.925L398.04,95.877C398.814,95.877 399.449,95.237 399.449,94.453L399.443,34.59C399.443,33.803 398.812,33.164 398.032,33.164Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M437.584,81.406C431.718,81.227 427.739,78.565 427.739,78.565L427.739,50.325C427.739,50.325 431.664,47.919 436.48,47.489C442.57,46.943 448.438,48.783 448.438,63.31C448.438,78.63 445.79,81.653 437.584,81.406ZM444.254,31.161C434.649,31.161 428.116,35.446 428.116,35.446L428.116,5.249C428.116,4.462 427.486,3.826 426.71,3.826L409.619,3.826C408.842,3.826 408.211,4.462 408.211,5.249L408.211,94.427C408.211,95.213 408.842,95.853 409.621,95.853L421.479,95.853C422.013,95.853 422.417,95.578 422.716,95.096C423.011,94.617 423.436,90.984 423.436,90.984C423.436,90.984 430.424,97.607 443.653,97.607C459.185,97.607 468.092,89.729 468.092,62.241C468.092,34.753 453.866,31.161 444.254,31.161Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M257.202,33.022L244.418,33.022C244.418,33.022 244.399,16.137 244.399,16.133C244.399,15.494 244.069,15.174 243.33,15.174L225.91,15.174C225.232,15.174 224.869,15.473 224.869,16.123L224.869,33.576C224.869,33.576 216.139,35.683 215.548,35.853C214.961,36.024 214.528,36.566 214.528,37.213L214.528,48.18C214.528,48.968 215.158,49.604 215.937,49.604L224.869,49.604L224.869,75.989C224.869,95.585 238.615,97.51 247.89,97.51C252.129,97.51 257.199,96.149 258.036,95.84C258.542,95.654 258.836,95.13 258.836,94.561L258.851,82.497C258.851,81.71 258.186,81.073 257.437,81.073C256.691,81.073 254.787,81.376 252.825,81.376C246.545,81.376 244.418,78.457 244.418,74.678C244.418,70.901 244.417,49.604 244.417,49.604L257.202,49.604C257.98,49.604 258.612,48.968 258.612,48.18L258.612,34.443C258.612,33.656 257.98,33.022 257.202,33.022Z" style="fill-rule:nonzero;"></path>
+    </g>
+</svg>
+
+      <time datetime="2026-02-23 15:04:15.000">Built 2026-02-23</time>
+    </a>
+  </footer>
+
+
+
+
+</body></html>

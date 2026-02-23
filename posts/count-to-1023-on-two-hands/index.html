@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <title>Count to 1023 on Two Hands | robstarbuck.uk</title>
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="stylesheet" href="/font.css">
+
+  <link rel="stylesheet" href="/minireset.css">
+  <link rel="stylesheet" href="/vertical-rhythm.css">
+  <link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/highlight-js/robstarbuck.uk.css">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=.75">
+
+  <meta name="view-transition" content="same-origin">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+
+  
+
+  <script defer="" src="/scripts/back-button.js"></script>
+
+</head>
+<body>
+  <nav>
+    <a href="/">
+      robstarbuck.uk
+    </a>
+  </nav>
+  <main>
+  <h2>Count to 1023 on Two Hands</h2>
+  <p><strong>If you can accept that ten binary digits <code>1111111111</code> represents 1023 in decimal, we can of course use our ten fingers to represent any number counting up to it.</strong></p>
+<div class="iframe"><iframe src="https://robstarbuck.github.io/finbin/" title="Finger Binary">
+</iframe></div>
+<p>This is a brief whistle-stop tour of a JS project that converts a number to it's handy binary representation. In building it I learnt a little about JS <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators#binary_bitwise_operators" target="_blank">Bitwise Operators</a> and their application. This post covers the utility of those operators and might interest any JS devs who are curious about their usage.</p>
+<p>Let's start with a single closed fist as our 0, you can click the fingers or adjust the input to change the value.</p>
+<div class="iframe"><iframe src="https://robstarbuck.github.io/finbin/?initialBinaryValue=0&amp;maxBinaryValue=31" title="Starting from Zero"></iframe></div>
+<p>I'm sure you're getting the gist. Wherever a finger is extended we count the digit in our calculation. Let's represent that most rock-and-roll of numbers, 18.</p>
+<div class="iframe"><iframe src="https://robstarbuck.github.io/finbin/?lockValue=true&amp;maxBinaryValue=18" title="The number 18"></iframe></div>
+<p>Translating the decimal value "18" to it's binary value "10010" looks like this:</p>
+<pre><code>Binary         1     0     0     1     0
+Bit Value      16    8     4     2     1
+Bit Position   5     4     3     2     1
+</code></pre>
+<p>These bit positions of course correspond to fingers. The number 18 has <strong>1s</strong> in bit positions 2 and 5 represented by our pinky and index fingers.</p>
+<p>We can prove our binary value equals 18 using <code>parseInt</code> and including a radix (or base) of 2 as our second argument.</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-built_in">parseInt</span>(<span class="hljs-string">"10010"</span>, <span class="hljs-number">2</span>);
+<span class="hljs-comment">// 18</span>
+</code></pre>
+<p>The radix tells parseInt we're dealing with a binary number (2 numbers, 1 and 0) and not a decimal (10 numbers, 0-9, parseInt's default value).</p>
+<blockquote>
+<p>Anyone who ever mistakenly tried <code>["1","2","3"].map(parseInt)</code> learnt the hard way about this second argument.</p>
+</blockquote>
+<p>It is of course possible to derive our "18" value from an array of booleans:</p>
+<pre><code>[true, false, false, true, false] =&gt; 10010 =&gt; 18
+</code></pre>
+<p>But that's well covered ground and not what I'm exploring here. Instead we'll be deriving our boolean values (is a finger extended) from our number.</p>
+<h3>Calculating the max value for a given number of fingers</h3>
+<p>The maximum value that can be represented by 10 fingers is 2 to the power of 10 minus one. Or <code>(2 ** 10) -1</code> in JS.</p>
+<p>The following chart shows the calculation for 2 to the power n.</p>
+<pre><code>n        0    1    2    3    4    5    6    7    8    9    10
+2 ** n   1    2    4    8    16   32   64   128  256  512  1024
+Finger   1    2    3    4    5    6    7    8    9    10   11
+</code></pre>
+<p>So our tenth finger will represent the number 512 but this isn't our maximum as we've yet to count all the fingers that came before it and doing so gives us our maximum value 1023.</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-number">1</span> + <span class="hljs-number">2</span> + <span class="hljs-number">4</span> + <span class="hljs-number">8</span> + <span class="hljs-number">16</span> + <span class="hljs-number">32</span> + <span class="hljs-number">64</span> + <span class="hljs-number">128</span> + <span class="hljs-number">256</span> + <span class="hljs-number">512</span>
+<span class="hljs-comment">// 1023</span>
+</code></pre>
+<p>To avoid totalling these numbers it's easier to take our <a href="https://robstarbuck.github.io/finbin/?initialBinaryValue=1024&amp;maxBinaryValue=2047" target="_blank">11th value 1024</a> and minus one.</p>
+<p>We can the parity of these values can be proven in JS.</p>
+<pre><code class="language-js hljs language-javascript">(<span class="hljs-number">1023</span>).<span class="hljs-title function_">toString</span>(<span class="hljs-number">2</span>);
+<span class="hljs-comment">// "1111111111"</span>
+(<span class="hljs-number">1023</span>).<span class="hljs-title function_">toString</span>(<span class="hljs-number">2</span>).<span class="hljs-property">length</span>;
+<span class="hljs-comment">// 10</span>
+(<span class="hljs-number">2</span> ** <span class="hljs-number">10</span>) -<span class="hljs-number">1</span> === <span class="hljs-number">1023</span>;
+<span class="hljs-comment">// true</span>
+<span class="hljs-built_in">parseInt</span>(<span class="hljs-string">"1111111111"</span>,<span class="hljs-number">2</span>) === <span class="hljs-number">1023</span>
+<span class="hljs-comment">// true</span>
+</code></pre>
+<h3>Each Fingers Value</h3>
+<p>Another thing we need to know is the value of each finger from right to left. Just as <code>2 ** 10</code> gave us the value of our 11th finger. We can use <code>2 ** n</code> to calculate each finger's binary value.</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-title class_">Array</span>(<span class="hljs-number">10</span>)
+    .<span class="hljs-title function_">fill</span>(<span class="hljs-literal">null</span>)
+    .<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">_, i</span>) =&gt;</span> <span class="hljs-number">2</span> ** i);
+    <span class="hljs-comment">// [ 1, 2, 4, 8, 16, 32, 64, 128, 256, 512 ]</span>
+</code></pre>
+<h3>Should a finger be extended</h3>
+<p>As we loop through the value of each finger we can use the <strong>AND</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_AND" target="_blank">(&amp;)</a> bitwise operator to determine if a value is included in our total and therefore the applicable finger extended. This is completely different to the logical AND represented by "&amp;&amp;". We'll explore this problem for our most knarliest of numbers <code>17</code>.</p>
+<div class="iframe"><iframe src="https://robstarbuck.github.io/finbin/?lockValue=true&amp;maxBinaryValue=17" title="The Knarly Number"></iframe></div>
+<p>To get our <code>Result</code> in the following examples we use our operator "&amp;" against each finger's corresponding <code>Value</code>. In decimal this would look like:</p>
+<ul>
+<li><code>1 &amp; 17</code></li>
+<li><code>2 &amp; 17</code></li>
+<li><code>4 &amp; 17</code></li>
+<li><code>8 &amp; 17</code></li>
+<li><code>16 &amp; 17</code></li>
+</ul>
+<p>Here are the same calculations visualised in binary.</p>
+<pre><code>Input                  00001   00010   00100   01000   10000
+Value (17)             10001   10001   10001   10001   10001
+Input &amp; Value (Result) 00001   00000   00000   00000   10000
+Result === Input       TRUE    FALSE   FALSE   FALSE   TRUE
+</code></pre>
+<p>I hope you can see what's happening here, wherever a 1 appears in the same bit position for both the <code>Input</code> and the <code>Value</code> the result <code>Input &amp; Value</code> gets a 1 in the same position. If the result matches the input we know that a finger should be extended. Let's run that calculation in JS to prove we're right.</p>
+<pre><code class="language-js hljs language-javascript">[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>,<span class="hljs-number">8</span>,<span class="hljs-number">16</span>].<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> (v &amp; <span class="hljs-number">17</span>) === v)
+<span class="hljs-comment">// [true, false, false, false, true]</span>
+</code></pre>
+<h3>Closing and extending fingers</h3>
+<p>Our last task is closing and extending fingers or taking away and adding values. Let's say that we have a single hand with all of it's fingers extended, giving us the number 31 or <code>11111</code> in binary. Let's close that most British of digits, the pinky finger, represented by the number 16 or <code>10000</code>.</p>
+<p>Our operator in this case will be <strong>XOR</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR" target="_blank">(^)</a>, this returns a <code>1</code> for every bit position where the values differ.</p>
+<pre><code>Input (16)            10000
+Value (31)            11111
+Input ^ Value (15)    01111  
+</code></pre>
+<p>Because XOR is only interested in the difference between the two binary values, we can use the same operator to extend our pinky finger, adding it back to the hand.</p>
+<pre><code>Value (15)            01111
+Input (16)            10000
+Value XOR Input (31)  11111  
+</code></pre>
+<h2>Summary</h2>
+<p>We've proven that an array of boolean values can equally be represented by a single number. Whilst Bitwise operators provide a powerful toolset for manipulating that number it is not without its limitations. The biggest limitation is the number of elements (or fingers) we can represent. Because of JS's implementation we are restricted to a maximum safe value of 9007199254740991, retrievable with the MAX_SAFE_INTEGER constant:</p>
+<pre><code class="language-js hljs language-javascript"><span class="hljs-title class_">Number</span>.<span class="hljs-property">MAX_SAFE_INTEGER</span>
+<span class="hljs-comment">// 9007199254740991</span>
+<span class="hljs-comment">// 11111111111111111111111111111111111111111111111111111</span>
+</code></pre>
+<p>These 52 <code>1</code>s represent 53 elements in an array, meaning we can safely operate on no larger number.</p>
+<p>Finally I'd be doubtful that anyone would thank you for the inclusion of bitwise operators in source code, their usage is certainly a little obscure but they've been fun to play around with.</p>
+
+  </main>
+  <footer>
+    <a href="https://github.com/robstarbuck">
+      <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+
+<svg width="100%" height="100%" viewbox="0 0 1501 406" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" space="preserve" xmlns:serif="http://www.serif.com/" style="fill: #2b2031;fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M177.281,41.988L147.014,41.988C146.233,41.988 145.6,42.622 145.6,43.403L145.6,58.201C145.6,58.982 146.233,59.618 147.014,59.618L158.821,59.618L158.821,78.003C158.821,78.003 156.17,78.907 148.84,78.907C140.193,78.907 128.113,75.747 128.113,49.183C128.113,22.614 140.692,19.118 152.501,19.118C162.724,19.118 167.127,20.918 169.93,21.785C170.811,22.055 171.625,21.178 171.625,20.397L175.001,6.099C175.001,5.733 174.877,5.293 174.461,4.994C173.323,4.182 166.38,0.297 148.84,0.297C128.634,0.297 107.908,8.894 107.908,50.219C107.908,91.545 131.638,97.704 151.635,97.704C168.192,97.704 178.236,90.628 178.236,90.628C178.65,90.4 178.695,89.821 178.695,89.556L178.695,43.403C178.695,42.622 178.062,41.988 177.281,41.988Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M333.265,5.249C333.265,4.462 332.641,3.826 331.859,3.826L314.817,3.826C314.039,3.826 313.406,4.462 313.406,5.249C313.406,5.253 313.411,38.183 313.411,38.183L286.846,38.183L286.846,5.249C286.846,4.462 286.22,3.826 285.44,3.826L268.399,3.826C267.624,3.826 266.991,4.462 266.991,5.249L266.991,94.427C266.991,95.213 267.624,95.853 268.399,95.853L285.44,95.853C286.22,95.853 286.846,95.213 286.846,94.427L286.846,56.282L313.411,56.282C313.411,56.282 313.364,94.424 313.364,94.427C313.364,95.213 313.996,95.853 314.776,95.853L331.858,95.853C332.639,95.853 333.263,95.213 333.265,94.427L333.265,5.249Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M209.44,16.951C209.44,10.815 204.521,5.856 198.451,5.856C192.387,5.856 187.463,10.815 187.463,16.951C187.463,23.081 192.387,28.054 198.451,28.054C204.521,28.054 209.44,23.081 209.44,16.951Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M208.222,93.564L208.222,34.45C208.222,33.669 207.591,33.03 206.812,33.03L189.823,33.03C189.044,33.03 188.347,33.833 188.347,34.615L188.347,93.592C188.347,95.325 189.427,95.84 190.824,95.84L206.13,95.84C207.81,95.84 208.222,95.016 208.222,93.564Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M398.032,33.164L381.121,33.164C380.346,33.164 379.714,33.803 379.714,34.59L379.714,78.316C379.714,78.316 375.417,81.46 369.319,81.46C363.222,81.46 361.604,78.693 361.604,72.722L361.604,34.59C361.604,33.803 360.974,33.164 360.197,33.164L343.033,33.164C342.259,33.164 341.624,33.803 341.624,34.59L341.624,75.609C341.624,93.344 351.508,97.683 365.105,97.683C376.261,97.683 385.255,91.52 385.255,91.52C385.255,91.52 385.683,94.768 385.877,95.153C386.07,95.537 386.575,95.925 387.121,95.925L398.04,95.877C398.814,95.877 399.449,95.237 399.449,94.453L399.443,34.59C399.443,33.803 398.812,33.164 398.032,33.164Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M437.584,81.406C431.718,81.227 427.739,78.565 427.739,78.565L427.739,50.325C427.739,50.325 431.664,47.919 436.48,47.489C442.57,46.943 448.438,48.783 448.438,63.31C448.438,78.63 445.79,81.653 437.584,81.406ZM444.254,31.161C434.649,31.161 428.116,35.446 428.116,35.446L428.116,5.249C428.116,4.462 427.486,3.826 426.71,3.826L409.619,3.826C408.842,3.826 408.211,4.462 408.211,5.249L408.211,94.427C408.211,95.213 408.842,95.853 409.621,95.853L421.479,95.853C422.013,95.853 422.417,95.578 422.716,95.096C423.011,94.617 423.436,90.984 423.436,90.984C423.436,90.984 430.424,97.607 443.653,97.607C459.185,97.607 468.092,89.729 468.092,62.241C468.092,34.753 453.866,31.161 444.254,31.161Z" style="fill-rule:nonzero;"></path>
+    </g>
+    <g transform="matrix(4.16667,0,0,4.16667,-449.617,-1.23749)">
+        <path d="M257.202,33.022L244.418,33.022C244.418,33.022 244.399,16.137 244.399,16.133C244.399,15.494 244.069,15.174 243.33,15.174L225.91,15.174C225.232,15.174 224.869,15.473 224.869,16.123L224.869,33.576C224.869,33.576 216.139,35.683 215.548,35.853C214.961,36.024 214.528,36.566 214.528,37.213L214.528,48.18C214.528,48.968 215.158,49.604 215.937,49.604L224.869,49.604L224.869,75.989C224.869,95.585 238.615,97.51 247.89,97.51C252.129,97.51 257.199,96.149 258.036,95.84C258.542,95.654 258.836,95.13 258.836,94.561L258.851,82.497C258.851,81.71 258.186,81.073 257.437,81.073C256.691,81.073 254.787,81.376 252.825,81.376C246.545,81.376 244.418,78.457 244.418,74.678C244.418,70.901 244.417,49.604 244.417,49.604L257.202,49.604C257.98,49.604 258.612,48.968 258.612,48.18L258.612,34.443C258.612,33.656 257.98,33.022 257.202,33.022Z" style="fill-rule:nonzero;"></path>
+    </g>
+</svg>
+
+      <time datetime="2026-02-23 15:04:15.000">Built 2026-02-23</time>
+    </a>
+  </footer>
+
+
+
+
+</body></html>
