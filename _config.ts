@@ -8,6 +8,10 @@ const site = lume({
   src: "./src",
 });
 
+// -----------------------------------------------------------------------------
+// Plugins
+// -----------------------------------------------------------------------------
+
 site.use(
   esbuild({
     extensions: [".ts", ".js"],
@@ -23,7 +27,12 @@ site.use(
   })
 );
 
-site.use(dateplugin())
+site.use(dateplugin());
+site.use(codeHighlight());
+
+// -----------------------------------------------------------------------------
+// Site Data & Assets
+// -----------------------------------------------------------------------------
 
 const [date, time] = new Date().toISOString().split(/T|\./);
 
@@ -31,19 +40,17 @@ site.data("layout", "layouts/index.vto");
 
 site.data("buildDate", date);
 site.data("buildTime", time);
-
 site.data("github", "https://github.com/robstarbuck");
 site.data("logoFill", "#2b2031");
 
 site.copy([".pdf", ".png", ".svg"]);
-
 site.copy("code", ".");
 site.copy("styles", ".");
 site.copy("images", ".");
 
-site.use(codeHighlight());
-
-// Site Process
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
 
 const isCustomTag = (el?: Element | null): el is Element => {
   return el?.tagName.includes("-") ?? false;
@@ -56,7 +63,7 @@ const wrapElement = (el: Element, wrapper: HTMLElement) => {
   }
 };
 
-// test for tagName, instanceof is unavailable in this context
+// Type predicates (instanceof is unavailable in this context)
 const isIframe = (e: Element): e is HTMLIFrameElement => {
   return e.tagName === "IFRAME";
 };
@@ -77,22 +84,27 @@ const isLinkExternal = (link: string) => {
   return /^http/.test(link);
 };
 
+// -----------------------------------------------------------------------------
+// Pre-process (Frontmatter & Data)
+// -----------------------------------------------------------------------------
+
 site.preprocess([".html"], (pages) => {
   pages.forEach((page) => {
+    // Configure Posts
     if (/posts/.test(page.src.path)) {
       page.data.tags = ["post"];
-      if (page.data.layout === undefined) {
-        page.data.layout = "layouts/index.vto";
-      }
+      page.data.layout ??= "layouts/index.vto";
     }
 
-    if(page.data.url.startsWith("/invoice")){
+    // Configure Invoices
+    if (page.data.url.startsWith("/invoice")) {
       page.data.layout = "layouts/invoice.vto";
-    };
+    }
 
-    page.data.modules = page.data.modules ?? [];
+    page.data.modules ??= [];
 
-    if (page.data.title?.toLocaleLowerCase() === "cv") {
+    // Configure CV
+    if (page.data.title?.toLowerCase() === "cv") {
       const [cvDate] = page.data.date.toISOString().split("T");
       const pdfName = cvDate.concat(".pdf");
       const pdfMatch = site.files.find((f) => f.entry.name === pdfName);
@@ -107,12 +119,15 @@ site.preprocess([".html"], (pages) => {
       page.data.tags = ["document", "cv"];
     }
   });
-  // page.data.filename = page.src.path + page.src.ext;
 });
 
-site.process([".html"], (pages, allPages) => {
-  const cv = pages.find((p) => p.data.title === "CV");
+// -----------------------------------------------------------------------------
+// Process (DOM Transformations)
+// -----------------------------------------------------------------------------
 
+site.process([".html"], (pages, allPages) => {
+  // Add IDs to CV headers for linking
+  const cv = pages.find((p) => p.data.title === "CV");
   cv?.document?.querySelectorAll("h1").forEach((h1) => {
     h1.setAttribute("data-id", h1.innerText.replace(/ +/g, "-"));
   });
@@ -123,8 +138,7 @@ site.process([".html"], (pages, allPages) => {
       return;
     }
 
-    // Create demo pages wherever a .create-page element exists
-
+    // 1. Wrap specific elements for styling/layout
     document
       .querySelectorAll("main :where(iframe, a, img, svg)")
       .forEach((element) => {
@@ -162,8 +176,11 @@ site.process([".html"], (pages, allPages) => {
         }
       });
 
+    // 2. Generate "Breakout" demo pages
+    // Finds elements with `data-breakout-url`, creates a standalone page for them,
+    // and adds a link to that page in the original document.
     document.querySelectorAll("main [data-breakout-url]").forEach((element) => {
-      // Avoid mutating the original page
+      // Clone the document to create the standalone demo page
       const doc = page.document?.cloneNode(true) as Document;
 
       const urlSuffix = element.getAttribute("data-breakout-url");
@@ -172,19 +189,22 @@ site.process([".html"], (pages, allPages) => {
         "data-breakout-button-color"
       );
 
-      const breakoutUrl = page.data.url + urlSuffix + ".html" ?? "breakout/";
+      const breakoutUrl = page.data.url + urlSuffix + ".html";
 
-      const a = doc.createElement("a");
+      // Add "Open" link to the ORIGINAL page
+      const a = document.createElement("a");
       a.setAttribute("href", breakoutUrl);
       a.textContent = "Open ↗";
       a.classList.add("breakout-link");
       element.parentElement?.appendChild(a);
-      // Note element.style seems unavailable
+
+      // Apply style to the parent in the ORIGINAL page
       element.parentElement?.setAttribute(
         "style",
         `--breakout-link-color: ${breakoutButtonColor}`
       );
 
+      // Setup the NEW demo page content
       const body = doc?.querySelector("body");
       if (body) {
         doc.documentElement.classList.add("breakout", breakoutClass ?? "");
@@ -208,6 +228,7 @@ site.process([".html"], (pages, allPages) => {
     });
   });
 
+  // 3. Generate README
   const readMe = Page.create({
     title: "READ ME",
     url: "README.md",

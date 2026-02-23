@@ -2,3 +2,4 @@ _site
 src/documents
 src/content.robstarbuck.uk
 src/posts
+.DS_Store
