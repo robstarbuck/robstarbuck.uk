@@ -10,7 +10,7 @@ main {
 }
 
 #cv-footer {
-    display:flex;
+    display: flex;
     justify-content: end;
     padding: var(--r) 0;
     gap: var(--r);
@@ -45,7 +45,8 @@ ul:not(:nth-of-type(1)) li {
     margin-bottom: var(--rh);
 }
 
-[data-id="Education"]~h3, [data-id="Education"]~h4 {
+[data-id="Education"]~h3,
+[data-id="Education"]~h4 {
     display: inline-block;
     margin: 0 var(--spacer) var(--spacer) 0;
 }
@@ -64,11 +65,13 @@ h3+h4 {
     display: inline-block;
     font-weight: normal;
 }
-h3:has(+ h4), h3+h4 {
+
+h3:has(+ h4),
+h3+h4 {
     margin-bottom: var(--rh);
 }
 
-.paper.-cv p > strong {
+.paper.-cv p>strong {
     font-weight: normal;
 }
 
@@ -80,12 +83,22 @@ h3:has(+ h4), h3+h4 {
 .abs {
     position: absolute;
 }
+
 .paper.-invoice header {
     position: relative;
     display: flex;
     height: var(--rh7);
     margin-bottom: var(--rh5);
     border-bottom: var(--rh1) solid #F7B500;
+}
+
+.content {
+    time {
+        position: absolute;
+        top: 0;
+        font-weight: bold;
+        right: 0;
+    }
 }
 
 @media print {
@@ -95,41 +108,61 @@ h3:has(+ h4), h3+h4 {
         page-break-after: avoid;
         break-inside: avoid;
     }
+
     h2:has(a):nth-of-type(4),
     h1:has(a):nth-of-type(11) {
         page-break-before: always;
     }
+
     h2 {
         page-break-before: auto;
         break-inside: auto;
     }
-    :root, body {
+
+    :root,
+    body {
         background: none;
     }
-    :root::after, body::after {
+
+    :root::after,
+    body::after {
         content: none !important;
     }
-    nav, footer, .post-script {
+
+    nav,
+    footer,
+    .post-script {
         display: none;
     }
+
     main {
         padding: 0;
     }
+
     :root {
         --r: 22px;
     }
+
     body {
         padding: 0;
     }
+
     .content {
         max-width: none;
     }
+
     .footer {
         position: fixed;
         right: 0;
         bottom: 0;
     }
-    
+
+}
+
+.signature {
+    width: 7.3cm;
+    mix-blend-mode: multiply;
+    margin-bottom: var(--rh2);
 }
 
 @page {

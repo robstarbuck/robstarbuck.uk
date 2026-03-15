@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "deno",
+			"command": "task",
+			"args": [
+				"serve"
+			],
+			"problemMatcher": [
+				"$deno"
+			],
+			"label": "deno: serve",
+			"detail": "$ deno run --allow-read --allow-net lume -s"
+		}
+	]
+}

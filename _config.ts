@@ -1,6 +1,6 @@
 import { Page } from "lume/core/file.ts";
 import lume from "lume/mod.ts";
-import dateplugin from "lume/plugins/date.ts";
+import datex from "lume/plugins/date.ts";
 import codeHighlight from "lume/plugins/code_highlight.ts";
 import esbuild from "lume/plugins/esbuild.ts";
 
@@ -27,7 +27,8 @@ site.use(
   })
 );
 
-site.use(dateplugin());
+site.use(datex(/* Options */));
+
 site.use(codeHighlight());
 
 // -----------------------------------------------------------------------------
@@ -43,7 +44,7 @@ site.data("buildTime", time);
 site.data("github", "https://github.com/robstarbuck");
 site.data("logoFill", "#2b2031");
 
-site.copy([".pdf", ".png", ".svg"]);
+site.copy([".pdf", ".png", ".svg", ".webp"]);
 site.copy("code", ".");
 site.copy("styles", ".");
 site.copy("images", ".");
@@ -107,8 +108,8 @@ site.preprocess([".html"], (pages) => {
     if (page.data.title?.toLowerCase() === "cv") {
       const [cvDate] = page.data.date.toISOString().split("T");
       const pdfName = cvDate.concat(".pdf");
-      const pdfMatch = site.files.find((f) => f.entry.name === pdfName);
-      page.data.pdfLink = pdfMatch?.entry.path;
+      const pdfMatch = site.files.find((f) => f.data.url.endsWith(pdfName));
+      page.data.pdfLink = pdfMatch?.data.url;
 
       const { github, repoUrl } = page.data;
       page.data.markdownLink =
@@ -142,6 +143,9 @@ site.process([".html"], (pages, allPages) => {
     document
       .querySelectorAll("main :where(iframe, a, img, svg)")
       .forEach((element) => {
+        if(element.classList.contains("ignore")){
+          return;
+        }
         if (isCustomTag(element.parentElement)) {
           const div = document.createElement("div");
           div.classList.add("custom");

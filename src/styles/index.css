@@ -102,6 +102,11 @@ footer,
     gap: var(--r);
 }
 
+nav {
+    color: var(--shade7);
+    text-decoration-color: var(--shade7);
+}
+
 .post-script {
     height: var(--rh4);
     box-sizing: border-box;
