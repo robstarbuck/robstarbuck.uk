@@ -5,6 +5,7 @@
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.json">
 <title>robstarbuck.uk/msg</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 <style>
   * {
     margin: 0;
@@ -261,6 +262,30 @@
       visibility: hidden !important;
     }
   }
+</style>
+<style>
+  :root {
+    --background-width: calc(3800px / 2.5);
+    --shade0: #2b2031;
+    --shade1: #423746;
+    --shade2: #5a505d;
+    --shade3: #746a75;
+    --shade4: #8e858e;
+    --shade5: #a9a2a7;
+    --shade6: #c5bfc2;
+    --shade7: #e2dddc;
+    --shade8: #fffcf8;
+    background-image: url('/bg-paper-light.webp');
+    background-blend-mode: normal;
+    background-color: var(--shade3);
+    background-size: var(--background-width);
+    background-position: bottom center;
+    background-attachment: fixed;
+    color: var(--shade0);
+}
+article {
+  font: 18px / 1.5 "Inter", sans-serif;
+}
 </style>
 <article contenteditable="plaintext-only" spellcheck autofocus></article>
 <button id="button" class="noprint">
