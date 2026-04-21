@@ -48,6 +48,8 @@ site.copy([".pdf", ".png", ".svg", ".webp"]);
 site.copy("code", ".");
 site.copy("styles", ".");
 site.copy("images", ".");
+site.copy("msg/index.html");
+site.copy("msg/qr.html","msg/qr.html");
 
 // -----------------------------------------------------------------------------
 // Helpers
