@@ -4,7 +4,7 @@
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.json">
-<title>Textarea</title>
+<title>robstarbuck.uk/msg</title>
 <style>
   * {
     margin: 0;
@@ -374,8 +374,9 @@
   }
 
   function updateTitle() {
-    const match = article.textContent.match(/^\n*#(.+)\n/)
-    document.title = match?.[1] ?? 'Textarea'
+    const [_, match] = article.textContent.match(/^\n*#(.+)\n/)
+    const prefix = 'robstarbuck.uk/msg'
+    document.title = match ? `${prefix} - ${match}` : prefix
   }
 
   async function compress(string) {
