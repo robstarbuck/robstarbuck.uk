@@ -277,11 +277,16 @@
     --shade8: #fffcf8;
     background-image: url('/bg-paper-light.webp');
     background-blend-mode: normal;
-    background-color: var(--shade3);
+    background-color: var(--shade1);
     background-size: var(--background-width);
     background-position: bottom center;
     background-attachment: fixed;
     color: var(--shade0);
+}
+@media (prefers-color-scheme: dark) {
+  :root{
+    background-blend-mode: multiply;
+  }
 }
 article {
   font: 18px / 1.5 "Inter", sans-serif;
