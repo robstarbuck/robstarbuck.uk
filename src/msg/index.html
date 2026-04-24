@@ -620,9 +620,11 @@ article {
         alert('Your browser does not support clipboard API')
         return
       }
-      navigator.clipboard.writeText(location.href)
-      notify('Link copied')
-      hideMenu()
+
+      navigator.clipboard.writeText([article.textContent.trim(),'---',location.href].join('\n\n')).then(() => {
+        notify('Link x')
+        hideMenu()
+      })
     })
     saveAsHTML.addEventListener('click', event => {
       event.preventDefault()
