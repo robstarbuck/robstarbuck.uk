@@ -404,8 +404,9 @@ article {
   }
 
   function updateTitle() {
-    const [_, match] = article.textContent.match(/^\n*#(.+)\n/)
-    const prefix = 'robstarbuck.uk/msg'
+    const [_, match] = article.textContent.match(/^\n*#(.+)\n/) ?? [,]
+    const {hostname, pathname} = new URLPattern(window.location.href);
+    const prefix = `${hostname}${pathname}`
     document.title = match ? `${prefix} - ${match}` : prefix
   }
 
@@ -446,6 +447,7 @@ article {
     const html = '<!DOCTYPE html>\n' + doc.outerHTML
 
     if ('showSaveFilePicker' in window) {
+      console.log('showSaveFilePicker')
       try {
         const handle = await showSaveFilePicker({
           suggestedName: document.title + '.html',
