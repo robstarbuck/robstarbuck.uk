@@ -49,6 +49,7 @@ site.copy("code", ".");
 site.copy("styles", ".");
 site.copy("images", ".");
 site.copy("msg/index.html");
+site.copy("txt/index.html");
 site.copy("msg/qr.html","msg/qr.html");
 
 // -----------------------------------------------------------------------------
