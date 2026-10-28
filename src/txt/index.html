@@ -165,8 +165,10 @@
             }
         }
 
+
+        const options = { value: initialText, spellcheck: true, autofocus: false, clickToToggleTasks: true, }
         // Initialize OverType
-        const overtypeInstance = new OverType('#editor', { value: initialText, spellcheck: true });
+        const overtypeInstance = new OverType('#editor', options);
         // The Overtype API returns a tuple array [editor]
         const editor = Array.isArray(overtypeInstance) ? overtypeInstance[0] : overtypeInstance;
 
