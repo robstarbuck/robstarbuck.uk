@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+
+<title>robstarbuck.uk/txt</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        color-scheme: light dark;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+
+        background-color: #fff;
+        --elevated: #fff;
+        --link: #0066cc;
+        --text: #161616;
+        --outline: #007aff;
+
+        @media (prefers-color-scheme: dark) {
+            background-color: #000;
+            --elevated: #121212;
+            --link: #58a6ff;
+            --text: #fff;
+        }
+    }
+
+    body {
+        color: var(--text);
+    }
+
+    a {
+        color: var(--link);
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        text-decoration-thickness: 1px;
+    }
+
+    article {
+        outline: none;
+        padding: 18px max(18px, calc(50vw - 400px));
+        width: 100%;
+        min-height: 100dvh;
+        font: 18px / 1.5 system-ui;
+        tab-size: 4;
+        white-space: pre-wrap;
+        text-wrap-style: stable;
+        overflow-wrap: break-word;
+    }
+</style>
+
+<style>
+    :root {
+        --background-width: calc(3800px / 3);
+        --shade0: #2b2031;
+        --shade1: #423746;
+        --shade2: #5a505d;
+        --shade3: #746a75;
+        --shade4: #8e858e;
+        --shade5: #a9a2a7;
+        --shade6: #c5bfc2;
+        --shade7: #e2dddc;
+        --shade8: #fffcf8;
+        background-image: url('/bg-paper-light.webp');
+        background-blend-mode: normal;
+        background-color: var(--shade1);
+        background-size: var(--background-width);
+        background-position: bottom center;
+        background-attachment: fixed;
+        color: var(--shade0);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            background-blend-mode: multiply;
+        }
+    }
+
+    article {
+        font: 18px / 1.5 "Inter", sans-serif;
+    }
+</style>
+<style>
+    #editor {
+        height: 100vh;
+        width: 800px;
+        /* Set your desired fixed width */
+        max-width: 100vw;
+        /* Ensures it shrinks on smaller screens */
+        margin: 0 auto;
+        /* Centers the editor horizontally */
+        box-sizing: border-box;
+        mix-blend-mode: multiply;
+    }
+
+    #menu {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 1000;
+    }
+
+    .menu-btn {
+        background-color: #f3f4f6;
+        color: #1f2937;
+        border: 1px solid #d1d5db;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s;
+    }
+
+    .menu-btn:hover {
+        background-color: #e5e7eb;
+        border-color: #9ca3af;
+    }
+</style>
+</head>
+
+<body>
+    <div id="editor"></div>
+
+    <div id="menu">
+        <button id="push-btn" class="menu-btn">Push to URL</button>
+        <button id="copy-btn" class="menu-btn">Copy URL</button>
+    </div>
+
+    <script type="module">
+        import OverType from 'https://cdn.jsdelivr.net/npm/overtype@latest/dist/overtype.esm.js';
+
+        // Robust UTF-8 Base64 Encoding/Decoding to handle all characters safely
+        function encodeBase64(str) {
+            const bytes = new TextEncoder().encode(str);
+            const binString = Array.from(bytes, byte => String.fromCodePoint(byte)).join('');
+            return btoa(binString);
+        }
+
+        function decodeBase64(str) {
+            const binString = atob(str);
+            const bytes = Uint8Array.from(binString, m => m.codePointAt(0));
+            return new TextDecoder().decode(bytes);
+        }
+
+        // 1. Read URL upon loading
+        let initialText = "";
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            try {
+                initialText = decodeBase64(hash);
+            } catch (e) {
+                console.error("Could not decode URL hash. Proceeding with empty text.", e);
+            }
+        }
+
+
+        const options = { value: initialText, spellcheck: true, autofocus: false, clickToToggleTasks: true, }
+        // Initialize OverType
+        const overtypeInstance = new OverType('#editor', options);
+        // The Overtype API returns a tuple array [editor]
+        const editor = Array.isArray(overtypeInstance) ? overtypeInstance[0] : overtypeInstance;
+
+        // Use the exposed textarea hook, falling back to document query if necessary
+        const textarea = editor.textarea || document.querySelector('#editor textarea');
+
+        function getCurrentText() {
+            return typeof editor.value === 'string' ? editor.value : (textarea ? textarea.value : '');
+        }
+
+        let timeout;
+        function updateUrl(text, pushHistory = false) {
+            const encoded = encodeBase64(text);
+            const newHash = encoded ? '#' + encoded : '';
+            const newUrl = window.location.pathname + window.location.search + newHash;
+
+            if (pushHistory) {
+                window.history.pushState(null, '', newUrl);
+            } else {
+                window.history.replaceState(null, '', newUrl);
+            }
+        }
+
+        // 2. Update automatically when typing (slightly debounced)
+        if (textarea) {
+            textarea.addEventListener('input', (e) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    // Standard updates use replaceState to avoid cluttering the browser history
+                    updateUrl(e.target.value, false);
+                }, 300);
+            });
+        }
+
+        // 3. Menu: Push to URL
+        document.getElementById('push-btn').addEventListener('click', () => {
+            clearTimeout(timeout);
+            updateUrl(getCurrentText(), true);
+        });
+
+        // 4. Menu: Copy URL
+        document.getElementById('copy-btn').addEventListener('click', (e) => {
+            // Ensure the URL is up-to-date with current content immediately before copying
+            clearTimeout(timeout);
+            updateUrl(getCurrentText(), false);
+
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                const btn = e.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => { btn.textContent = originalText; }, 2000);
+            }).catch(err => {
+                console.error("Failed to copy URL", err);
+            });
+        });
+    </script>
+</body>
+
+</html>
